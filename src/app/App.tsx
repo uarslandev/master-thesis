@@ -85,14 +85,16 @@ const ModeButton = ({ active, onClick, icon: Icon, label, description }: {
   </button>
 );
 
-const ConfusionMatrix = () => (
-  <div className="border border-gray-100 rounded-lg overflow-hidden">
+const ConfusionMatrix = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="border border-gray-100 rounded-lg overflow-hidden">
     <table className="w-full text-sm">
       <thead>
         <tr className="bg-gray-50 text-gray-500">
           <th className="p-4 text-left font-medium"></th>
-          <th className="p-4 text-center font-medium">With ASC diagnosis</th>
-          <th className="p-4 text-center font-medium">Without ASC diagnosis</th>
+          <th className="p-4 text-center font-medium">{t('confusionMatrix.withASC')}</th>
+          <th className="p-4 text-center font-medium">{t('confusionMatrix.withoutASC')}</th>
         </tr>
       </thead>
       <tbody>
@@ -105,51 +107,51 @@ const ConfusionMatrix = () => (
         ))}
       </tbody>
     </table>
-  </div>
-);
+    </div>
+  );
+};
 
 // --- Mode Views ---
 
-const ScreeningView = () => (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 max-w-7xl mx-auto">
+const ScreeningView = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 max-w-7xl mx-auto">
     <div className="space-y-8">
       <section>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Clinical Decision Support Summary</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('screening.title')}</h2>
         <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-          SIT-CARE analyzes multimodal data (facial, prosody, gaze) collected during the Simulated Interaction Task. 
-          The model assesses subtle behavioral markers that may be missed during manual observation, 
-          especially in adults who utilize compensatory strategies.
+          {t('screening.description')}
         </p>
         <div className="p-5 bg-teal-50 border border-teal-100 rounded-xl mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-bold text-teal-900 uppercase tracking-tight">Diagnosis Probability</span>
-            <span className="text-xs font-semibold text-teal-700 bg-teal-100 px-2 py-0.5 rounded">High Confidence</span>
+            <span className="text-sm font-bold text-teal-900 uppercase tracking-tight">{t('screening.diagnosisProbability')}</span>
+            <span className="text-xs font-semibold text-teal-700 bg-teal-100 px-2 py-0.5 rounded">{t('screening.highConfidence')}</span>
           </div>
           <div className="flex items-end gap-2">
             <span className="text-5xl font-black text-teal-900">74%</span>
-            <span className="text-sm text-teal-700 mb-2 font-medium">Likelihood of ASC</span>
+            <span className="text-sm text-teal-700 mb-2 font-medium">{t('screening.likelihoodOfASC')}</span>
           </div>
           <p className="mt-4 text-xs text-teal-800 leading-relaxed">
-            The model identifies patterns consistent with ASC presentations in adults, 
-            accounting for potential masking in vocal prosody and gaze stability.
+            {t('screening.modelDescription')}
           </p>
         </div>
         <ConfusionMatrix />
       </section>
       
       <section>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Biomarker Significance</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('screening.biomarkerSignificance')}</h2>
         <div className="space-y-4">
           <div className="flex items-start gap-3 p-4 bg-orange-50/50 rounded-lg border border-orange-100">
             <AlertTriangle className="text-orange-500 shrink-0 mt-0.5" size={18} />
             <p className="text-sm text-orange-800">
-              <span className="font-bold">Masking Alert:</span> Patient shows high facial expressivity scores, which may indicate high compensation (camouflaging) during the first 5 minutes of SIT interaction.
+              <span className="font-bold">{t('screening.maskingAlert')}</span> {t('screening.maskingAlertText')}
             </p>
           </div>
           <div className="flex items-start gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
             <Info className="text-blue-500 shrink-0 mt-0.5" size={18} />
             <p className="text-sm text-blue-800">
-              The AI model refers exclusively to non-verbal behaviors captured during actor interaction. Discrepancies with self-reports (ADI-R) are common in high-masking adults.
+              {t('screening.aiModelNote')}
             </p>
           </div>
         </div>
@@ -163,15 +165,15 @@ const ScreeningView = () => (
             <Activity className="text-teal-600" size={24} />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">Screening Result</h3>
-            <p className="text-xs text-gray-500">Based on SIT Multimodal Fusion</p>
+            <h3 className="font-bold text-gray-900">{t('screening.screeningResult')}</h3>
+            <p className="text-xs text-gray-500">{t('screening.basedOnSIT')}</p>
           </div>
         </div>
         <div className="bg-gray-50 p-8 rounded-2xl border border-gray-100 text-center">
-          <div className="text-sm text-gray-500 mb-2 uppercase tracking-widest font-bold">Recommended Action</div>
-          <div className="text-2xl font-black text-gray-900 mb-4">Proceed to Full Diagnostic Interview</div>
+          <div className="text-sm text-gray-500 mb-2 uppercase tracking-widest font-bold">{t('screening.recommendedAction')}</div>
+          <div className="text-2xl font-black text-gray-900 mb-4">{t('screening.proceedToInterview')}</div>
           <div className="text-sm text-gray-600 max-w-sm mx-auto">
-            The automated screening suggests that clinical observation (ADOS-2) is warranted despite potential camouflaging.
+            {t('screening.screeningSuggestion')}
           </div>
         </div>
       </div>
@@ -179,34 +181,37 @@ const ScreeningView = () => (
       <div className="p-6 bg-teal-900 rounded-2xl text-white">
         <h3 className="font-semibold mb-3 flex items-center gap-2">
           <Fingerprint size={18} className="text-teal-400" />
-          Digital Biomarker Profile
+          {t('screening.digitalBiomarker')}
         </h3>
         <div className="space-y-4">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-teal-300">Gaze Consistency</span>
-            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">Atypical</span>
+            <span className="text-teal-300">{t('screening.gazeConsistency')}</span>
+            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">{t('screening.atypical')}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-teal-300">Vocal Pitch Variance</span>
-            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">Restricted</span>
+            <span className="text-teal-300">{t('screening.vocalPitchVariance')}</span>
+            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">{t('screening.restricted')}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-teal-300">Micro-expression Latency</span>
-            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">Delayed</span>
+            <span className="text-teal-300">{t('screening.microExpressionLatency')}</span>
+            <span className="font-mono bg-teal-800 px-2 py-0.5 rounded">{t('screening.delayed')}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
-const LearningView = () => (
-  <div className="p-8 max-w-7xl mx-auto space-y-8">
+const LearningView = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Identifying Subtle ASC Markers in Adults</h2>
+        <h2 className="text-xl font-bold text-gray-900">{t('learning.title')}</h2>
         <p className="text-sm text-gray-600 max-w-2xl">
-          Adults with ASC often use <strong>camouflaging</strong> to mask social difficulties. The SIT task reveals "leakage" in non-verbal channels that are difficult to consciously control.
+          {t('learning.description')}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {BEHAVIORAL_TRAITS.map((trait) => (
@@ -230,18 +235,18 @@ const LearningView = () => (
       <div className="space-y-6">
         <div className="bg-teal-900 text-white p-6 rounded-2xl">
           <GraduationCap className="mb-4 text-teal-300" size={32} />
-          <h3 className="text-lg font-bold mb-2">Training Module: Masking</h3>
+          <h3 className="text-lg font-bold mb-2">{t('learning.trainingModule')}</h3>
           <p className="text-sm text-teal-100 leading-relaxed mb-4">
-            Learn to detect the discrepancy between high "Social Reciprocity" scores (compensatory) and atypical "Vocal Prosody" (objective biomarker).
+            {t('learning.trainingDescription')}
           </p>
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs bg-teal-800/50 p-2 rounded-lg">
               <div className="w-2 h-2 rounded-full bg-teal-400" />
-              Identify compensatory gaze patterns
+              {t('learning.identifyGaze')}
             </div>
             <div className="flex items-center gap-2 text-xs bg-teal-800/50 p-2 rounded-lg">
               <div className="w-2 h-2 rounded-full bg-teal-400" />
-              Analyze micro-expression latency
+              {t('learning.analyzeMicro')}
             </div>
           </div>
         </div>
@@ -249,27 +254,30 @@ const LearningView = () => (
         <div className="p-6 border border-gray-100 rounded-2xl bg-white shadow-sm">
           <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Brain size={18} className="text-teal-600" />
-            Theoretical Framework
+            {t('learning.theoreticalFramework')}
           </h4>
           <div className="space-y-4">
             <div className="text-sm">
-              <div className="font-semibold text-gray-700 mb-1">Camouflaging (Masking)</div>
-              <p className="text-gray-500 text-xs leading-relaxed">Cognitive strategies used to hide social challenges. SIT-CARE looks for the "cost" of masking in physiological and motor data.</p>
+              <div className="font-semibold text-gray-700 mb-1">{t('learning.camouflaging')}</div>
+              <p className="text-gray-500 text-xs leading-relaxed">{t('learning.camouflaguingDesc')}</p>
             </div>
             <div className="text-sm">
-              <div className="font-semibold text-gray-700 mb-1">Digital Biomarkers</div>
-              <p className="text-gray-500 text-xs leading-relaxed">Objective, quantifiable data points extracted via computer vision that correlate with clinical diagnosis.</p>
+              <div className="font-semibold text-gray-700 mb-1">{t('learning.digitalBiomarkers')}</div>
+              <p className="text-gray-500 text-xs leading-relaxed">{t('learning.digitalBiomarkersDesc')}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
-const AssessmentView = () => (
-  <div className="p-8 max-w-7xl mx-auto space-y-8">
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+const AssessmentView = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       
       {/* Detailed Diagnostics */}
       <div className="lg:col-span-8 space-y-8">
@@ -278,7 +286,7 @@ const AssessmentView = () => (
             <div className="flex items-center gap-4">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
                 <Layers size={18} className="text-teal-600" />
-                Multimodal Fusion Analysis
+                {t('assessment.multimodalFusion')}
               </h3>
               <div className="flex gap-2">
                 <span className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase">SIT Task #G4</span>
@@ -293,14 +301,14 @@ const AssessmentView = () => (
                 <PolarAngleAxis dataKey="trait" tick={{ fontSize: 11, fill: '#6b7280', fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
                 <Radar
-                  name="Patient G532XHW"
+                  name={t('assessment.patientLabel')}
                   dataKey="patient"
                   stroke="#0d9488"
                   fill="#0d9488"
                   fillOpacity={0.6}
                 />
                 <Radar
-                  name="Neurotypical Avg"
+                  name={t('assessment.neurotypicalAvg')}
                   dataKey="average"
                   stroke="#94a3b8"
                   fill="#94a3b8"
@@ -315,7 +323,7 @@ const AssessmentView = () => (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 text-sm">Gaze & Prosody Synchrony</h3>
+              <h3 className="font-bold text-gray-900 text-sm">{t('assessment.gazeProsodySynchrony')}</h3>
               <Info size={14} className="text-gray-400" />
             </div>
             <div className="h-[180px] w-full">
@@ -330,13 +338,13 @@ const AssessmentView = () => (
               </ResponsiveContainer>
             </div>
             <div className="mt-4 flex gap-4 text-[10px] text-gray-500 justify-center">
-              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-teal-600" /> Gaze Patterns</div>
-              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-indigo-500" /> Vocal Intensity</div>
+              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-teal-600" /> {t('assessment.gazePatterns')}</div>
+              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-indigo-500" /> {t('assessment.vocalIntensity')}</div>
             </div>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-4 text-sm">Differential Diagnosis Comparison</h3>
+            <h3 className="font-bold text-gray-900 mb-4 text-sm">{t('assessment.differentialDiagnosis')}</h3>
             <div className="space-y-4">
               {DIFFERENTIAL_DIAGNOSIS_DATA.map((item) => (
                 <div key={item.name} className="space-y-1">
@@ -362,16 +370,16 @@ const AssessmentView = () => (
         <div className="bg-gray-900 text-white p-6 rounded-2xl">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
             <Stethoscope size={20} className="text-teal-400" />
-            Clinical CDSS Note
+            {t('assessment.clinicalNote')}
           </h3>
           <div className="space-y-4 text-sm text-gray-300">
             <div className="p-4 bg-gray-800 rounded-lg border-l-4 border-teal-500">
-              <p className="font-bold text-white mb-1">Masking Indicator (High)</p>
-              <p className="text-xs leading-relaxed">The discrepancy between Social Reciprocity (40%) and Vocal Prosody (65%) suggests significant cognitive effort to mask symptoms during SIT interaction.</p>
+              <p className="font-bold text-white mb-1">{t('assessment.maskingIndicator')}</p>
+              <p className="text-xs leading-relaxed">{t('assessment.maskingIndicatorDesc')}</p>
             </div>
             <div className="p-4 bg-gray-800 rounded-lg border-l-4 border-amber-500">
-              <p className="font-bold text-white mb-1">Differential diagnosis alert</p>
-              <p className="text-xs leading-relaxed">High overlap with ADHD markers observed in head movement patterns. Recommend screening for executive dysfunction.</p>
+              <p className="font-bold text-white mb-1">{t('assessment.differentialAlert')}</p>
+              <p className="text-xs leading-relaxed">{t('assessment.differentialAlertDesc')}</p>
             </div>
           </div>
         </div>
@@ -379,26 +387,27 @@ const AssessmentView = () => (
         <div className="p-6 border-2 border-dashed border-gray-200 rounded-2xl">
           <h4 className="font-bold text-gray-900 mb-3 text-sm flex items-center gap-2">
             <Activity size={16} />
-            SIT-CARE Parameters
+            {t('assessment.sitParameters')}
           </h4>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="p-2 bg-gray-50 rounded-lg text-center">
-              <div className="text-[10px] text-gray-400 font-bold uppercase">XGBoost Ver</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase">{t('assessment.xgboostVersion')}</div>
               <div className="text-xs font-black">v4.2.0</div>
             </div>
             <div className="p-2 bg-gray-50 rounded-lg text-center">
-              <div className="text-[10px] text-gray-400 font-bold uppercase">Confidence</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase">{t('assessment.confidence')}</div>
               <div className="text-xs font-black">94.2%</div>
             </div>
           </div>
           <button className="w-full py-2 bg-teal-600 text-white rounded-lg text-xs font-bold hover:bg-teal-700 transition-colors">
-            Generate Detailed Clinical Report
+            {t('assessment.generateReport')}
           </button>
         </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // --- Main App ---
 
