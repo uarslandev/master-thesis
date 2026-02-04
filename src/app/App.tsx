@@ -1,38 +1,32 @@
-import React, { useState } from 'react';
-import { 
-  Activity, 
-  Brain, 
-  GraduationCap, 
-  Search, 
-  Settings, 
-  User, 
-  AlertTriangle, 
-  Info, 
-  ChevronRight,
-  BarChart3,
-  Layers,
-  Fingerprint,
-  Stethoscope
+import {
+    Activity,
+    AlertTriangle,
+    Brain,
+    Fingerprint,
+    GraduationCap,
+    Info,
+    Layers,
+    Settings,
+    Stethoscope,
+    User
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as ReChartsTooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell,
-  LineChart,
-  Line,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    CartesianGrid,
+    Line,
+    LineChart,
+    PolarAngleAxis,
+    PolarGrid,
+    PolarRadiusAxis,
+    Radar,
+    RadarChart,
+    Tooltip as ReChartsTooltip,
+    ResponsiveContainer,
+    XAxis,
+    YAxis
 } from 'recharts';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
@@ -410,25 +404,28 @@ const AssessmentView = () => (
 
 export default function App() {
   const [activeMode, setActiveMode] = useState<ViewMode>('screening');
+  const { t } = useTranslation();
+
+  console.log("App component rendering");
 
   const modes = [
     { 
       id: 'screening', 
-      label: 'Screening', 
+      label: t('modes.screening.label'), 
       icon: Activity, 
-      desc: 'Early-stage screening & support' 
+      desc: t('modes.screening.description') 
     },
     { 
       id: 'learning', 
-      label: 'Learning', 
+      label: t('modes.learning.label'), 
       icon: GraduationCap, 
-      desc: 'Educational views for training' 
+      desc: t('modes.learning.description') 
     },
     { 
       id: 'assessment', 
-      label: 'In-depth', 
+      label: t('modes.assessment.label'), 
       icon: Stethoscope, 
-      desc: 'Complex cases & diagnosis' 
+      desc: t('modes.assessment.description') 
     },
   ] as const;
 
@@ -445,12 +442,13 @@ export default function App() {
           </div>
           
           <nav className="hidden md:flex items-center bg-white/10 p-1 rounded-xl ml-4">
-            <button className="px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors">Data-based Assessment</button>
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-lg">Model-based Assessment</button>
+            <button className="px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors">{t('header.dataAssessment')}</button>
+            <button className="px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-lg">{t('header.modelAssessment')}</button>
           </nav>
         </div>
 
         <div className="flex items-center gap-4 text-gray-400">
+          <LanguageSwitcher />
           <button className="p-2 hover:bg-white/10 rounded-full transition-colors"><User size={20} /></button>
           <button className="p-2 hover:bg-white/10 rounded-full transition-colors"><Settings size={20} /></button>
         </div>
@@ -460,15 +458,15 @@ export default function App() {
         {/* Sidebar */}
         <aside className="w-72 bg-gray-50 border-r border-gray-100 flex flex-col p-6 overflow-y-auto hidden lg:flex">
           <div className="mb-8">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">Current Patient</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.currentPatient')}</label>
             <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
               <div className="font-black text-xl text-gray-900 mb-1">G532XHW</div>
-              <div className="text-xs text-gray-500">Last Assessment: Jan 27, 2026</div>
+              <div className="text-xs text-gray-500">{t('sidebar.lastAssessment')}: Jan 27, 2026</div>
             </div>
           </div>
 
           <div className="flex-1 space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">Analysis Mode</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
             {modes.map((mode) => (
               <ModeButton 
                 key={mode.id}
@@ -485,10 +483,10 @@ export default function App() {
             <div className="p-4 bg-teal-900 rounded-xl text-white">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300">AI Status</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300">{t('sidebar.aiStatus')}</span>
               </div>
               <div className="text-xs font-medium leading-relaxed">
-                Model v4.2.0 active. Processing confidence: 94%.
+                {t('sidebar.modelActive')}
               </div>
             </div>
           </div>
