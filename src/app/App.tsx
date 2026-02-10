@@ -646,12 +646,78 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
     );
   };
 
+  const renderVocalContent = () => {
+    if (!data) {
+      return null;
+    }
+
+    return (
+    <div className="space-y-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+            <Activity size={18} className="text-teal-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <img
+            src={data.image}
+            alt="Vocal prosody visualization"
+            className="w-full h-auto"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Patient</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.features.map((feature) =>
+                feature.rows.map((row, rowIndex) => (
+                  <tr
+                    key={row.id}
+                    className={rowIndex === 0 ? "border-t border-gray-100" : ""}
+                  >
+                    <td className="p-4 text-gray-700 align-top">
+                      {rowIndex === 0 ? (
+                        <div className="font-semibold text-gray-900">{feature.name}</div>
+                      ) : null}
+                      <div className="text-xs text-gray-500">{row.label}</div>
+                    </td>
+                    <td className="p-4 text-center text-gray-700">{row.patient}</td>
+                    <td className="p-4 text-center text-gray-700">{row.control}</td>
+                    <td className="p-4 text-center text-gray-700">{row.asc}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    );
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       {modality === 'gaze' && data ? (
         renderGazeContent()
       ) : modality === 'facial' && data ? (
         renderFacialContent()
+      ) : modality === 'vocal' && data ? (
+        renderVocalContent()
       ) : (
         <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
@@ -676,22 +742,30 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
 
 export default function App() {
   const getRouteStateFromPath = (path: string): { route: RouteView; modality: Modality | null } => {
-    if (!path.startsWith('/data-assessment')) {
-      return { route: 'model', modality: null };
+    if (path === '/' || path.startsWith('/data-assessment')) {
+      if (path === '/') {
+        return { route: 'data', modality: null };
+      }
+
+      const parts = path.split('/').filter(Boolean);
+      const maybeModality = parts[1];
+
+      if (maybeModality && MODALITY_IDS.includes(maybeModality as Modality)) {
+        return { route: 'data', modality: maybeModality as Modality };
+      }
+
+      return { route: 'data', modality: null };
     }
 
-    const parts = path.split('/').filter(Boolean);
-    const maybeModality = parts[1];
-
-    if (maybeModality && MODALITY_IDS.includes(maybeModality as Modality)) {
-      return { route: 'data', modality: maybeModality as Modality };
+    if (path.startsWith('/model')) {
+      return { route: 'model', modality: null };
     }
 
     return { route: 'data', modality: null };
   };
 
   const initialRouteState = typeof window === 'undefined'
-    ? { route: 'model', modality: null }
+    ? { route: 'data', modality: null }
     : getRouteStateFromPath(window.location.pathname);
   const [routeState, setRouteState] = useState(initialRouteState);
   const [activeMode, setActiveMode] = useState<ViewMode>('screening');
@@ -700,7 +774,7 @@ export default function App() {
   const setRoutePath = (nextRoute: RouteView, nextModality: Modality | null = null) => {
     const nextPath = nextRoute === 'data'
       ? `/data-assessment${nextModality ? `/${nextModality}` : ''}`
-      : '/';
+      : '/model';
     window.history.pushState({}, '', nextPath);
     setRouteState({ route: nextRoute, modality: nextModality });
   };

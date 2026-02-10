@@ -1,5 +1,6 @@
-import gazeHeatmap from './images/gaze-heatmap.png';
 import facialIntensity from './images/facial positive intensity.png';
+import gazeHeatmap from './images/gaze-heatmap.png';
+import vocalVisualization from './images/voice vis.png';
 
 export const modalityData = {
   gaze: {
@@ -96,7 +97,57 @@ export const modalityData = {
       },
     ],
   },
-  vocal: null,
+  vocal: {
+    image: vocalVisualization,
+    features: [
+      {
+        id: 'pitch-variance',
+        name: 'Pitch',
+        rows: [
+          {
+            id: 'pitch-variance-row',
+            label: 'Variance',
+            patient: '18.4',
+            control: '14.2',
+            asc: '21.1',
+          },
+        ],
+      },
+      {
+        id: 'speed',
+        name: 'Speed',
+        rows: [
+          {
+            id: 'speed-mean',
+            label: 'Mean',
+            patient: '1.18',
+            control: '1.25',
+            asc: '1.06',
+          },
+          {
+            id: 'speed-variance',
+            label: 'Variance',
+            patient: '0.12',
+            control: '0.09',
+            asc: '0.16',
+          },
+        ],
+      },
+      {
+        id: 'loudness-variance',
+        name: 'Loudness',
+        rows: [
+          {
+            id: 'loudness-variance-row',
+            label: 'Variance',
+            patient: '6.8',
+            control: '5.9',
+            asc: '7.4',
+          },
+        ],
+      },
+    ],
+  },
   head: null,
   mimicry: null,
 } as const;
