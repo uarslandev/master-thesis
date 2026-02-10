@@ -1,35 +1,35 @@
 import {
-  Activity,
-  AlertTriangle,
-  Brain,
-  Eye,
-  Fingerprint,
-  GraduationCap,
-  Info,
-  Layers,
-  Mic,
-  Move,
-  Settings,
-  Smile,
-  Stethoscope,
-  Theater,
-  User
+    Activity,
+    AlertTriangle,
+    Brain,
+    Eye,
+    Fingerprint,
+    GraduationCap,
+    Info,
+    Layers,
+    Mic,
+    Move,
+    Settings,
+    Smile,
+    Stethoscope,
+    Theater,
+    User
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
-  Tooltip as ReChartsTooltip,
-  ResponsiveContainer,
-  XAxis,
-  YAxis
+    CartesianGrid,
+    Line,
+    LineChart,
+    PolarAngleAxis,
+    PolarGrid,
+    PolarRadiusAxis,
+    Radar,
+    RadarChart,
+    Tooltip as ReChartsTooltip,
+    ResponsiveContainer,
+    XAxis,
+    YAxis
 } from 'recharts';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 
