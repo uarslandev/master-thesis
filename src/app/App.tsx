@@ -31,6 +31,7 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
+import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
   Select,
