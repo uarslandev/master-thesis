@@ -31,8 +31,15 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './components/ui/select';
+import { modalityData } from '../data/modalityData';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
@@ -524,6 +531,42 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
   const label = t(`modalities.${modality}.label`);
   const description = t(`modalities.${modality}.description`);
   const data = modalityData[modality];
+  const [referenceGroup, setReferenceGroup] = useState('control');
+  const [gender, setGender] = useState('all');
+
+  const renderFilters = () => (
+    <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reference Group</div>
+          <Select value={referenceGroup} onValueChange={setReferenceGroup}>
+            <SelectTrigger className="w-full bg-gray-50 border-gray-200">
+              <SelectValue placeholder="Select reference" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="control">Control Group</SelectItem>
+              <SelectItem value="asc">ASC</SelectItem>
+              <SelectItem value="adhd">ADHD</SelectItem>
+              <SelectItem value="sad">SAD</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gender</div>
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger className="w-full bg-gray-50 border-gray-200">
+              <SelectValue placeholder="Select gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderGazeContent = () => {
     if (!data) {
@@ -532,6 +575,7 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
 
     return (
     <div className="space-y-6">
+      {renderFilters()}
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
@@ -589,6 +633,7 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
 
     return (
     <div className="space-y-6">
+      {renderFilters()}
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
@@ -653,6 +698,7 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
 
     return (
     <div className="space-y-6">
+      {renderFilters()}
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
@@ -710,6 +756,136 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
     );
   };
 
+  const renderHeadContent = () => {
+    if (!data) {
+      return null;
+    }
+
+    return (
+    <div className="space-y-6">
+      {renderFilters()}
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+            <Activity size={18} className="text-teal-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <img
+            src={data.image}
+            alt="Head movement visualization"
+            className="w-full h-auto"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Patient</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.features.map((feature) =>
+                feature.rows.map((row, rowIndex) => (
+                  <tr
+                    key={row.id}
+                    className={rowIndex === 0 ? "border-t border-gray-100" : ""}
+                  >
+                    <td className="p-4 text-gray-700 align-top">
+                      {rowIndex === 0 ? (
+                        <div className="font-semibold text-gray-900">{feature.name}</div>
+                      ) : null}
+                      <div className="text-xs text-gray-500">{row.label}</div>
+                    </td>
+                    <td className="p-4 text-center text-gray-700">{row.patient}</td>
+                    <td className="p-4 text-center text-gray-700">{row.control}</td>
+                    <td className="p-4 text-center text-gray-700">{row.asc}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    );
+  };
+
+  const renderMimicryContent = () => {
+    if (!data) {
+      return null;
+    }
+
+    return (
+    <div className="space-y-6">
+      {renderFilters()}
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+            <Activity size={18} className="text-teal-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <img
+            src={data.image}
+            alt="Mimicry visualization"
+            className="w-full h-auto"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Patient</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.features.map((feature) =>
+                feature.rows.map((row, rowIndex) => (
+                  <tr
+                    key={row.id}
+                    className={rowIndex === 0 ? "border-t border-gray-100" : ""}
+                  >
+                    <td className="p-4 text-gray-700 align-top">
+                      {rowIndex === 0 ? (
+                        <div className="font-semibold text-gray-900">{feature.name}</div>
+                      ) : null}
+                      <div className="text-xs text-gray-500">{row.label}</div>
+                    </td>
+                    <td className="p-4 text-center text-gray-700">{row.patient}</td>
+                    <td className="p-4 text-center text-gray-700">{row.control}</td>
+                    <td className="p-4 text-center text-gray-700">{row.asc}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    );
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       {modality === 'gaze' && data ? (
@@ -718,6 +894,10 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
         renderFacialContent()
       ) : modality === 'vocal' && data ? (
         renderVocalContent()
+      ) : modality === 'head' && data ? (
+        renderHeadContent()
+      ) : modality === 'mimicry' && data ? (
+        renderMimicryContent()
       ) : (
         <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">

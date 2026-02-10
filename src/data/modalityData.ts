@@ -1,5 +1,7 @@
 import facialIntensity from './images/facial positive intensity.png';
 import gazeHeatmap from './images/gaze-heatmap.png';
+import headVisualization from './images/head vis.png';
+import mimicVisualization from './images/mimic vis.png';
 import vocalVisualization from './images/voice vis.png';
 
 export const modalityData = {
@@ -148,6 +150,80 @@ export const modalityData = {
       },
     ],
   },
-  head: null,
-  mimicry: null,
+  head: {
+    image: headVisualization,
+    features: [
+      {
+        id: 'nodding',
+        name: 'Nodding',
+        rows: [
+          {
+            id: 'nodding-mean',
+            label: 'Mean',
+            patient: '0.74',
+            control: '0.69',
+            asc: '0.61',
+          },
+          {
+            id: 'nodding-variance',
+            label: 'Variance',
+            patient: '0.16',
+            control: '0.12',
+            asc: '0.21',
+          },
+        ],
+      },
+      {
+        id: 'horizontal-movement',
+        name: 'Horizontal movement',
+        rows: [
+          {
+            id: 'horizontal-mean',
+            label: 'Mean',
+            patient: '0.58',
+            control: '0.63',
+            asc: '0.50',
+          },
+          {
+            id: 'horizontal-variance',
+            label: 'Variance',
+            patient: '0.14',
+            control: '0.11',
+            asc: '0.19',
+          },
+        ],
+      },
+    ],
+  },
+  mimicry: {
+    image: mimicVisualization,
+    features: [
+      {
+        id: 'cross-correlation',
+        name: 'Cross-correlation',
+        rows: [
+          {
+            id: 'cross-correlation-row',
+            label: 'Score',
+            patient: '0.62',
+            control: '0.70',
+            asc: '0.54',
+          },
+        ],
+      },
+      {
+        id: 'dtw',
+        name: 'DTW',
+        rows: [
+          {
+            id: 'dtw-row',
+            label: 'Distance',
+            patient: '1.24',
+            control: '1.01',
+            asc: '1.38',
+          },
+        ],
+      },
+    ],
+  },
 } as const;
