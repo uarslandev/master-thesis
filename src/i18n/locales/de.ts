@@ -116,6 +116,7 @@ export default {
     gazePatterns: "Blickstarke",
     vocalIntensity: "Prosodie-Starke",
     differentialDiagnosis: "Relativer Modalitatsbeitrag",
+    modalityPlaceholder: "Modalitats-spezifische Analysen erscheinen hier.",
   },
   traits: {
     gazePatterns: "Blickmuster",

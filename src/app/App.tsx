@@ -73,6 +73,8 @@ const TIME_SERIES_DATA = Array.from({ length: 20 }, (_, i) => ({
   movement: Math.random() * 100,
 }));
 
+const MODALITY_IDS: Modality[] = ['gaze', 'facial', 'vocal', 'head', 'mimicry'];
+
 // --- Sub-components ---
 
 const ModeButton = ({ active, onClick, icon: Icon, label, description }: { 
@@ -516,39 +518,67 @@ const DataAssessmentView = () => {
   );
 };
 
+const DataModalityView = ({ modality }: { modality: Modality }) => {
+  const { t } = useTranslation();
+  const label = t(`modalities.${modality}.label`);
+  const description = t(`modalities.${modality}.description`);
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+            <Activity size={18} className="text-teal-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+        <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-sm text-gray-500">
+          {t('dataAssessment.modalityPlaceholder')}
+        </div>
+      </section>
+    </div>
+  );
+};
+
 // --- Main App ---
 
 export default function App() {
-  const getRouteFromPath = (path: string): RouteView => {
-    if (path.startsWith('/data-assessment')) {
-      return 'data';
+  const getRouteStateFromPath = (path: string): { route: RouteView; modality: Modality | null } => {
+    if (!path.startsWith('/data-assessment')) {
+      return { route: 'model', modality: null };
     }
 
-    return 'model';
+    const parts = path.split('/').filter(Boolean);
+    const maybeModality = parts[1];
+
+    if (maybeModality && MODALITY_IDS.includes(maybeModality as Modality)) {
+      return { route: 'data', modality: maybeModality as Modality };
+    }
+
+    return { route: 'data', modality: null };
   };
 
-  const initialRoute = typeof window === 'undefined'
-    ? 'model'
-    : getRouteFromPath(window.location.pathname);
-  const [route, setRoute] = useState<RouteView>(initialRoute);
+  const initialRouteState = typeof window === 'undefined'
+    ? { route: 'model', modality: null }
+    : getRouteStateFromPath(window.location.pathname);
+  const [routeState, setRouteState] = useState(initialRouteState);
   const [activeMode, setActiveMode] = useState<ViewMode>('screening');
-  const [dataMode, setDataMode] = useState<ViewMode>('assessment');
-  const [activeModality, setActiveModality] = useState<Modality | null>(null);
   const { t } = useTranslation();
 
-  const navigate = (nextRoute: RouteView) => {
-    if (nextRoute === route) {
-      return;
-    }
-
-    const nextPath = nextRoute === 'data' ? '/data-assessment' : '/';
+  const setRoutePath = (nextRoute: RouteView, nextModality: Modality | null = null) => {
+    const nextPath = nextRoute === 'data'
+      ? `/data-assessment${nextModality ? `/${nextModality}` : ''}`
+      : '/';
     window.history.pushState({}, '', nextPath);
-    setRoute(nextRoute);
+    setRouteState({ route: nextRoute, modality: nextModality });
   };
 
   React.useEffect(() => {
     const handlePopState = () => {
-      setRoute(getRouteFromPath(window.location.pathname));
+      setRouteState(getRouteStateFromPath(window.location.pathname));
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -578,7 +608,8 @@ export default function App() {
     },
   ] as const;
 
-  const isDataRoute = route === 'data';
+  const isDataRoute = routeState.route === 'data';
+  const activeModality = routeState.modality;
 
   const modalities = [
     {
@@ -632,7 +663,7 @@ export default function App() {
                   ? 'text-white bg-teal-600 rounded-lg shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
-              onClick={() => navigate('data')}
+              onClick={() => setRoutePath('data')}
             >
               {t('header.dataAssessment')}
             </button>
@@ -642,7 +673,7 @@ export default function App() {
                   ? 'text-white bg-teal-600 rounded-lg shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
-              onClick={() => navigate('model')}
+              onClick={() => setRoutePath('model')}
             >
               {t('header.modelAssessment')}
             </button>
@@ -675,7 +706,7 @@ export default function App() {
                   <ModeButton
                     key={modality.id}
                     active={activeModality === modality.id}
-                    onClick={() => setActiveModality(modality.id)}
+                    onClick={() => setRoutePath('data', modality.id)}
                     icon={modality.icon}
                     label={modality.label}
                     description={modality.desc}
@@ -685,19 +716,21 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex-1 space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
-            {modes.map((mode) => (
-              <ModeButton 
-                key={mode.id}
-                active={(isDataRoute ? dataMode : activeMode) === mode.id}
-                onClick={() => (isDataRoute ? setDataMode(mode.id) : setActiveMode(mode.id))}
-                icon={mode.icon}
-                label={mode.label}
-                description={mode.desc}
-              />
-            ))}
-          </div>
+          {!isDataRoute && (
+            <div className="flex-1 space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
+              {modes.map((mode) => (
+                <ModeButton 
+                  key={mode.id}
+                  active={activeMode === mode.id}
+                  onClick={() => setActiveMode(mode.id)}
+                  icon={mode.icon}
+                  label={mode.label}
+                  description={mode.desc}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="mt-auto pt-6 border-t border-gray-200">
             <div className="p-4 bg-teal-900 rounded-xl text-white">
@@ -713,31 +746,46 @@ export default function App() {
         </aside>
 
         {/* Mobile Mode Switcher (Tab-like) */}
-        <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
-          {modes.map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => (isDataRoute ? setDataMode(mode.id) : setActiveMode(mode.id))}
-              className={`flex-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
-                (isDataRoute ? dataMode : activeMode) === mode.id
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-white text-gray-600 border border-gray-200'
-              }`}
-            >
-              <mode.icon size={16} />
-              {mode.label}
-            </button>
-          ))}
-        </div>
+        {isDataRoute ? (
+          <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
+            {modalities.map((modality) => (
+              <button
+                key={modality.id}
+                onClick={() => setRoutePath('data', modality.id)}
+                className={`flex-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
+                  activeModality === modality.id
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200'
+                }`}
+              >
+                <modality.icon size={16} />
+                {modality.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
+            {modes.map((mode) => (
+              <button
+                key={mode.id}
+                onClick={() => setActiveMode(mode.id)}
+                className={`flex-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
+                  activeMode === mode.id
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200'
+                }`}
+              >
+                <mode.icon size={16} />
+                {mode.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Main Content */}
         <main className="flex-1 bg-white overflow-y-auto">
           {isDataRoute ? (
-            <>
-              {dataMode === 'screening' && <ScreeningView />}
-              {dataMode === 'learning' && <LearningView />}
-              {dataMode === 'assessment' && <DataAssessmentView />}
-            </>
+            activeModality ? <DataModalityView modality={activeModality} /> : <DataAssessmentView />
           ) : (
             <>
               {activeMode === 'screening' && <ScreeningView />}

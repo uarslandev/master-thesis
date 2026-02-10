@@ -8,7 +8,8 @@
 		"ghcr.io/rocker-org/devcontainer-features/miniforge:2": {},
 		"ghcr.io/stu-bell/devcontainer-features/node:0": {},
 		"ghcr.io/devcontainers-extra/features/npm-package:1": {},
-		"ghcr.io/devcontainers-extra/features/zsh-plugins:0": {}
+		"ghcr.io/devcontainers-extra/features/zsh-plugins:0": {},
+		"ghcr.io/jckimble/devcontainer-features/ngrok:3": {}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.

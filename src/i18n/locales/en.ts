@@ -116,6 +116,7 @@ export default {
     gazePatterns: "Gaze Strength",
     vocalIntensity: "Prosody Strength",
     differentialDiagnosis: "Relative Modality Contribution",
+    modalityPlaceholder: "Modality-specific analytics will appear here.",
   },
   traits: {
     gazePatterns: "Gaze Patterns",
