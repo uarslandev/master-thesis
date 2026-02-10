@@ -32,6 +32,7 @@ import {
     YAxis
 } from 'recharts';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
+  import { modalityData } from '../data/modalityData';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
@@ -522,10 +523,11 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
   const { t } = useTranslation();
   const label = t(`modalities.${modality}.label`);
   const description = t(`modalities.${modality}.description`);
+  const data = modalityData[modality];
 
-  return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+  const renderGazeContent = () => (
+    <div className="space-y-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
             <Activity size={18} className="text-teal-600" />
@@ -535,10 +537,65 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
             <p className="text-xs text-gray-500">{description}</p>
           </div>
         </div>
-        <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-sm text-gray-500">
-          {t('dataAssessment.modalityPlaceholder')}
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <img
+            src={data.image}
+            alt="Gaze heatmap visualization"
+            className="w-full h-auto"
+          />
         </div>
-      </section>
+      </div>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Patient</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.features.map((feature) => (
+                <tr key={feature.id} className="border-t border-gray-100">
+                  <td className="p-4 text-gray-700">
+                    <div className="font-semibold text-gray-900">{feature.name}</div>
+                    <div className="text-xs text-gray-500">{feature.detail}</div>
+                  </td>
+                  <td className="p-4 text-center text-gray-700">{feature.patient}</td>
+                  <td className="p-4 text-center text-gray-700">{feature.control}</td>
+                  <td className="p-4 text-center text-gray-700">{feature.asc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      {modality === 'gaze' && data ? (
+        renderGazeContent()
+      ) : (
+        <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+              <Activity size={18} className="text-teal-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+              <p className="text-xs text-gray-500">{description}</p>
+            </div>
+          </div>
+          <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-sm text-gray-500">
+            {t('dataAssessment.modalityPlaceholder')}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
