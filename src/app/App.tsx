@@ -525,7 +525,12 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
   const description = t(`modalities.${modality}.description`);
   const data = modalityData[modality];
 
-  const renderGazeContent = () => (
+  const renderGazeContent = () => {
+    if (!data) {
+      return null;
+    }
+
+    return (
     <div className="space-y-6">
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
@@ -574,12 +579,79 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
         </div>
       </div>
     </div>
-  );
+    );
+  };
+
+  const renderFacialContent = () => {
+    if (!data) {
+      return null;
+    }
+
+    return (
+    <div className="space-y-6">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+            <Activity size={18} className="text-teal-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{label}</h2>
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <img
+            src={data.image}
+            alt="Facial expressivity intensity visualization"
+            className="w-full h-auto"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Patient</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.features.map((feature) =>
+                feature.rows.map((row, rowIndex) => (
+                  <tr
+                    key={row.id}
+                    className={rowIndex === 0 ? "border-t border-gray-100" : ""}
+                  >
+                    <td className="p-4 text-gray-700 align-top">
+                      {rowIndex === 0 ? (
+                        <div className="font-semibold text-gray-900">{feature.name}</div>
+                      ) : null}
+                      <div className="text-xs text-gray-500">{row.label}</div>
+                    </td>
+                    <td className="p-4 text-center text-gray-700">{row.patient}</td>
+                    <td className="p-4 text-center text-gray-700">{row.control}</td>
+                    <td className="p-4 text-center text-gray-700">{row.asc}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    );
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       {modality === 'gaze' && data ? (
         renderGazeContent()
+      ) : modality === 'facial' && data ? (
+        renderFacialContent()
       ) : (
         <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
