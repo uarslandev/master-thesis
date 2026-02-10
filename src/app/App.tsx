@@ -31,8 +31,8 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
+import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
-  import { modalityData } from '../data/modalityData';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
