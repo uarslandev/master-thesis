@@ -7,8 +7,31 @@ export default {
     currentPatient: "Current Patient",
     lastAssessment: "Last Assessment",
     analysisMode: "Analysis Mode",
+    modality: "Modality",
     aiStatus: "AI Status",
     modelActive: "Model v4.2.0 active. Processing confidence: 94%.",
+  },
+  modalities: {
+    gaze: {
+      label: "Gaze",
+      description: "Fixation density and attention",
+    },
+    facial: {
+      label: "Facial Expressivity",
+      description: "Micro-expression variability",
+    },
+    vocal: {
+      label: "Vocal Prosody",
+      description: "Pitch and rhythm stability",
+    },
+    head: {
+      label: "Head Movement",
+      description: "Motion consistency signals",
+    },
+    mimicry: {
+      label: "Mimicry",
+      description: "Imitation timing strength",
+    },
   },
   modes: {
     screening: {
@@ -84,6 +107,15 @@ export default {
     xgboostVersion: "XGBoost Ver",
     confidence: "Confidence",
     generateReport: "Generate Detailed Clinical Report",
+  },
+  dataAssessment: {
+    multimodalFusion: "Statistical Strength of Modalities",
+    patientLabel: "Patient G532XHW",
+    neurotypicalAvg: "Neurotypical Avg",
+    gazeProsodySynchrony: "Cross-Modality Consistency",
+    gazePatterns: "Gaze Strength",
+    vocalIntensity: "Prosody Strength",
+    differentialDiagnosis: "Relative Modality Contribution",
   },
   traits: {
     gazePatterns: "Gaze Patterns",

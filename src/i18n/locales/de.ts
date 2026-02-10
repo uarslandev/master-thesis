@@ -7,8 +7,31 @@ export default {
     currentPatient: "Aktueller Patient",
     lastAssessment: "Letzte Bewertung",
     analysisMode: "Analysemodus",
+    modality: "Modalitat",
     aiStatus: "KI-Status",
     modelActive: "Modell v4.2.0 aktiv. Verarbeitungsvertrauen: 94%.",
+  },
+  modalities: {
+    gaze: {
+      label: "Blick",
+      description: "Fixationsdichte und Aufmerksamkeit",
+    },
+    facial: {
+      label: "Gesichtsausdruck",
+      description: "Mikroausdruck-Variabilitat",
+    },
+    vocal: {
+      label: "Stimmprosodie",
+      description: "Stabilitat von Tonhohe und Rhythmus",
+    },
+    head: {
+      label: "Kopfbewegung",
+      description: "Bewegungskonsistenzsignale",
+    },
+    mimicry: {
+      label: "Mimikry",
+      description: "Starke der Imitationszeit",
+    },
   },
   modes: {
     screening: {
@@ -84,6 +107,15 @@ export default {
     xgboostVersion: "XGBoost Ver",
     confidence: "Vertrauen",
     generateReport: "Detaillierten klinischen Bericht erstellen",
+  },
+  dataAssessment: {
+    multimodalFusion: "Statistische Starke der Modalitaten",
+    patientLabel: "Patient G532XHW",
+    neurotypicalAvg: "Neurotypischer Durchschnitt",
+    gazeProsodySynchrony: "Modalitaten-Ubergreifende Konsistenz",
+    gazePatterns: "Blickstarke",
+    vocalIntensity: "Prosodie-Starke",
+    differentialDiagnosis: "Relativer Modalitatsbeitrag",
   },
   traits: {
     gazePatterns: "Blickmuster",

@@ -1,16 +1,21 @@
 import {
-    Activity,
-    AlertTriangle,
-    Brain,
-    Fingerprint,
-    GraduationCap,
-    Info,
-    Layers,
-    Settings,
-    Stethoscope,
-    User
+  Activity,
+  AlertTriangle,
+  Brain,
+  Eye,
+  Fingerprint,
+  GraduationCap,
+  Info,
+  Layers,
+  Mic,
+  Move,
+  Settings,
+  Smile,
+  Stethoscope,
+  Theater,
+  User
 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     CartesianGrid,
@@ -30,6 +35,8 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
+type RouteView = 'model' | 'data';
+type Modality = 'gaze' | 'facial' | 'vocal' | 'head' | 'mimicry';
 
 // --- Mock Data ---
 const CONFUSION_MATRIX = [
@@ -43,6 +50,14 @@ const BEHAVIORAL_TRAITS = [
   { trait: 'Vocal Prosody', patient: 65, average: 75, educational: 'Analyzes pitch variance and rhythm. Flat or atypical prosody is common in ASC.' },
   { trait: 'Head Movement', patient: 80, average: 30, educational: 'Tracks coordination and excessive or restricted movement during response phases.' },
   { trait: 'Social Reciprocity', patient: 40, average: 75, educational: 'The timing and quality of back-and-forth social interaction within the SIT paradigm.' },
+];
+
+const MODALITY_STRENGTHS = [
+  { trait: 'Gaze', patient: 52, average: 70 },
+  { trait: 'Facial Expressivity', patient: 38, average: 68 },
+  { trait: 'Vocal Prosody', patient: 61, average: 73 },
+  { trait: 'Head Movement', patient: 44, average: 58 },
+  { trait: 'Mimicry', patient: 33, average: 60 },
 ];
 
 const DIFFERENTIAL_DIAGNOSIS_DATA = [
@@ -409,11 +424,136 @@ const AssessmentView = () => {
   );
 };
 
+const DataAssessmentView = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <div className="grid grid-cols-1 gap-8">
+        <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Layers size={18} className="text-teal-600" />
+                {t('dataAssessment.multimodalFusion')}
+              </h3>
+              <div className="flex gap-2">
+                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase">SIT Task #G4</span>
+                <span className="px-2 py-1 bg-teal-50 text-teal-700 text-[10px] font-bold rounded uppercase">74% Strength Index</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-[350px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={MODALITY_STRENGTHS}>
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis dataKey="trait" tick={{ fontSize: 11, fill: '#6b7280', fontWeight: 'bold' }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <Radar
+                  name={t('dataAssessment.patientLabel')}
+                  dataKey="patient"
+                  stroke="#0d9488"
+                  fill="#0d9488"
+                  fillOpacity={0.6}
+                />
+                <Radar
+                  name={t('dataAssessment.neurotypicalAvg')}
+                  dataKey="average"
+                  stroke="#94a3b8"
+                  fill="#94a3b8"
+                  fillOpacity={0.2}
+                />
+                <ReChartsTooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-900 text-sm">{t('dataAssessment.gazeProsodySynchrony')}</h3>
+              <Info size={14} className="text-gray-400" />
+            </div>
+            <div className="h-[180px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={TIME_SERIES_DATA}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                  <XAxis dataKey="time" hide />
+                  <YAxis hide />
+                  <Line type="monotone" dataKey="gaze" stroke="#0d9488" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="movement" stroke="#6366f1" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 flex gap-4 text-[10px] text-gray-500 justify-center">
+              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-teal-600" /> {t('dataAssessment.gazePatterns')}</div>
+              <div className="flex items-center gap-1"><div className="w-2 h-0.5 bg-indigo-500" /> {t('dataAssessment.vocalIntensity')}</div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <h3 className="font-bold text-gray-900 mb-4 text-sm">{t('dataAssessment.differentialDiagnosis')}</h3>
+            <div className="space-y-4">
+              {DIFFERENTIAL_DIAGNOSIS_DATA.map((item) => (
+                <div key={item.name} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">{item.name}</span>
+                    <span className="font-bold text-gray-900">{item.probability}%</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{ width: `${item.probability}%`, backgroundColor: item.color }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
 // --- Main App ---
 
 export default function App() {
+  const getRouteFromPath = (path: string): RouteView => {
+    if (path.startsWith('/data-assessment')) {
+      return 'data';
+    }
+
+    return 'model';
+  };
+
+  const initialRoute = typeof window === 'undefined'
+    ? 'model'
+    : getRouteFromPath(window.location.pathname);
+  const [route, setRoute] = useState<RouteView>(initialRoute);
   const [activeMode, setActiveMode] = useState<ViewMode>('screening');
+  const [dataMode, setDataMode] = useState<ViewMode>('assessment');
+  const [activeModality, setActiveModality] = useState<Modality | null>(null);
   const { t } = useTranslation();
+
+  const navigate = (nextRoute: RouteView) => {
+    if (nextRoute === route) {
+      return;
+    }
+
+    const nextPath = nextRoute === 'data' ? '/data-assessment' : '/';
+    window.history.pushState({}, '', nextPath);
+    setRoute(nextRoute);
+  };
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      setRoute(getRouteFromPath(window.location.pathname));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   console.log("App component rendering");
 
@@ -438,6 +578,41 @@ export default function App() {
     },
   ] as const;
 
+  const isDataRoute = route === 'data';
+
+  const modalities = [
+    {
+      id: 'gaze',
+      label: t('modalities.gaze.label'),
+      icon: Eye,
+      desc: t('modalities.gaze.description'),
+    },
+    {
+      id: 'facial',
+      label: t('modalities.facial.label'),
+      icon: Smile,
+      desc: t('modalities.facial.description'),
+    },
+    {
+      id: 'vocal',
+      label: t('modalities.vocal.label'),
+      icon: Mic,
+      desc: t('modalities.vocal.description'),
+    },
+    {
+      id: 'head',
+      label: t('modalities.head.label'),
+      icon: Move,
+      desc: t('modalities.head.description'),
+    },
+    {
+      id: 'mimicry',
+      label: t('modalities.mimicry.label'),
+      icon: Theater,
+      desc: t('modalities.mimicry.description'),
+    },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-teal-100">
       {/* Header */}
@@ -451,8 +626,26 @@ export default function App() {
           </div>
           
           <nav className="hidden md:flex items-center bg-white/10 p-1 rounded-xl ml-4">
-            <button className="px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors">{t('header.dataAssessment')}</button>
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-lg">{t('header.modelAssessment')}</button>
+            <button
+              className={`px-4 py-2 text-sm font-semibold transition-colors ${
+                isDataRoute
+                  ? 'text-white bg-teal-600 rounded-lg shadow-lg'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => navigate('data')}
+            >
+              {t('header.dataAssessment')}
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-semibold transition-colors ${
+                !isDataRoute
+                  ? 'text-white bg-teal-600 rounded-lg shadow-lg'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => navigate('model')}
+            >
+              {t('header.modelAssessment')}
+            </button>
           </nav>
         </div>
 
@@ -474,13 +667,31 @@ export default function App() {
             </div>
           </div>
 
+          {isDataRoute && (
+            <div className="mb-8">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.modality')}</label>
+              <div className="space-y-2">
+                {modalities.map((modality) => (
+                  <ModeButton
+                    key={modality.id}
+                    active={activeModality === modality.id}
+                    onClick={() => setActiveModality(modality.id)}
+                    icon={modality.icon}
+                    label={modality.label}
+                    description={modality.desc}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex-1 space-y-2">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
             {modes.map((mode) => (
               <ModeButton 
                 key={mode.id}
-                active={activeMode === mode.id}
-                onClick={() => setActiveMode(mode.id)}
+                active={(isDataRoute ? dataMode : activeMode) === mode.id}
+                onClick={() => (isDataRoute ? setDataMode(mode.id) : setActiveMode(mode.id))}
                 icon={mode.icon}
                 label={mode.label}
                 description={mode.desc}
@@ -506,9 +717,11 @@ export default function App() {
           {modes.map((mode) => (
             <button
               key={mode.id}
-              onClick={() => setActiveMode(mode.id)}
+              onClick={() => (isDataRoute ? setDataMode(mode.id) : setActiveMode(mode.id))}
               className={`flex-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
-                activeMode === mode.id ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 border border-gray-200'
+                (isDataRoute ? dataMode : activeMode) === mode.id
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-white text-gray-600 border border-gray-200'
               }`}
             >
               <mode.icon size={16} />
@@ -519,9 +732,19 @@ export default function App() {
 
         {/* Main Content */}
         <main className="flex-1 bg-white overflow-y-auto">
-          {activeMode === 'screening' && <ScreeningView />}
-          {activeMode === 'learning' && <LearningView />}
-          {activeMode === 'assessment' && <AssessmentView />}
+          {isDataRoute ? (
+            <>
+              {dataMode === 'screening' && <ScreeningView />}
+              {dataMode === 'learning' && <LearningView />}
+              {dataMode === 'assessment' && <DataAssessmentView />}
+            </>
+          ) : (
+            <>
+              {activeMode === 'screening' && <ScreeningView />}
+              {activeMode === 'learning' && <LearningView />}
+              {activeMode === 'assessment' && <AssessmentView />}
+            </>
+          )}
         </main>
       </div>
     </div>

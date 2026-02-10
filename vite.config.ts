@@ -4,6 +4,10 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+    server: {
+        host: true,
+        port: 8080
+    },
   plugins: [
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
