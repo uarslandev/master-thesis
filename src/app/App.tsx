@@ -34,13 +34,12 @@ import {
 import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from './components/ui/select';
-import { modalityData } from '../data/modalityData';
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
