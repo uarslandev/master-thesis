@@ -17,7 +17,7 @@ export default {
   },
   sidebar: {
     currentPatient: "Aktueller Patient",
-    lastAssessment: "Letzte Bewertung",
+    lastAssessment: "Bewertungsdatum",
     analysisMode: "Analysemodus",
     modality: "Modalitat",
     aiStatus: "KI-Status",

@@ -31,12 +31,12 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-  import facialAscExample from '../data/images/facial-asc.svg';
-  import facialWithoutAscExample from '../data/images/facial-without-asc.svg';
-  import gazeAscExample from '../data/images/gaze-asc.svg';
-  import gazeWithoutAscExample from '../data/images/gaze-without-asc.svg';
-  import vocalAscExample from '../data/images/vocal-asc.svg';
-  import vocalWithoutAscExample from '../data/images/vocal-without-asc.svg';
+import facialAscExample from '../data/images/facial-asc.svg';
+import facialWithoutAscExample from '../data/images/facial-without-asc.svg';
+import gazeAscExample from '../data/images/gaze-asc.svg';
+import gazeWithoutAscExample from '../data/images/gaze-without-asc.svg';
+import vocalAscExample from '../data/images/vocal-asc.svg';
+import vocalWithoutAscExample from '../data/images/vocal-without-asc.svg';
 import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
