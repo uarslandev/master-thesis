@@ -10,7 +10,7 @@ export default {
     howTitle: "Wie funktioniert SIT-CARE?",
     howBody: "Die Software erkennt und analysiert automatisch Verhaltensmarker wie Gesichtsausdruck, Blickrichtung, Kopfbewegungen und Stimmprosodie. Die Ergebnisse werden als Visualisierungen oder KI-basierte Empfehlungen dargestellt.",
     chooseTitle: "Analysemodus wählen",
-    chooseBody: "Wählen Sie unten einen Analysemodus, um Ihre modellbasierte Bewertung zu starten. Sie können ihn später in den Einstellungen (Zahnrad-Symbol) ändern.",
+    chooseBody: "Wählen Sie unten einen Analysemodus, um Ihre datenbasierte Bewertung zu starten. Sie können ihn später in den Einstellungen (Zahnrad-Symbol) ändern.",
   },
   settings: {
     analysisMode: "Analysemodus",

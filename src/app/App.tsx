@@ -31,16 +31,22 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
+  import facialAscExample from '../data/images/facial-asc.svg';
+  import facialWithoutAscExample from '../data/images/facial-without-asc.svg';
+  import gazeAscExample from '../data/images/gaze-asc.svg';
+  import gazeWithoutAscExample from '../data/images/gaze-without-asc.svg';
+  import vocalAscExample from '../data/images/vocal-asc.svg';
+  import vocalWithoutAscExample from '../data/images/vocal-without-asc.svg';
 import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
 import {
     Select,
@@ -60,6 +66,16 @@ type ModeOption = {
   label: string;
   icon: any;
   desc: string;
+};
+
+type LearningStatRow = {
+  id: string;
+  name: string;
+  detail: string;
+  control: string;
+  asc: string;
+  correlation: string;
+  pValue: string;
 };
 
 // --- Mock Data ---
@@ -98,6 +114,147 @@ const TIME_SERIES_DATA = Array.from({ length: 20 }, (_, i) => ({
 }));
 
 const MODALITY_IDS: Modality[] = ['gaze', 'facial', 'vocal', 'head', 'mimicry'];
+
+const LEARNING_STATS: Record<'gaze' | 'facial' | 'vocal', LearningStatRow[]> = {
+  gaze: [
+    {
+      id: 'horizontal-gaze-angle',
+      name: 'Horizontal gaze angle',
+      detail: 'Variance',
+      control: '3.2 deg',
+      asc: '5.1 deg',
+      correlation: '0.32',
+      pValue: '0.02',
+    },
+    {
+      id: 'gaze-fixation-screen',
+      name: 'Gaze fixation on the screen',
+      detail: 'Time-wise %',
+      control: '71%',
+      asc: '58%',
+      correlation: '-0.28',
+      pValue: '0.04',
+    },
+    {
+      id: 'gaze-fixation-partner',
+      name: 'Gaze fixation on the interaction partner',
+      detail: 'Time-wise %',
+      control: '18%',
+      asc: '28%',
+      correlation: '0.35',
+      pValue: '0.01',
+    },
+  ],
+  facial: [
+    {
+      id: 'smile-mean',
+      name: 'Smile intensity of mouth and eye region',
+      detail: 'Mean over time',
+      control: '0.58',
+      asc: '0.49',
+      correlation: '-0.41',
+      pValue: '0.01',
+    },
+    {
+      id: 'smile-variance',
+      name: 'Smile intensity of mouth and eye region',
+      detail: 'Variance over time',
+      control: '0.14',
+      asc: '0.22',
+      correlation: '0.29',
+      pValue: '0.03',
+    },
+    {
+      id: 'brow-mean',
+      name: 'Eye brown lowerer',
+      detail: 'Mean over time',
+      control: '0.37',
+      asc: '0.52',
+      correlation: '0.33',
+      pValue: '0.02',
+    },
+    {
+      id: 'brow-variance',
+      name: 'Eye brown lowerer',
+      detail: 'Variance over time',
+      control: '0.10',
+      asc: '0.16',
+      correlation: '0.27',
+      pValue: '0.04',
+    },
+    {
+      id: 'facial-mean',
+      name: 'General facial intensity',
+      detail: 'Mean over time',
+      control: '0.51',
+      asc: '0.47',
+      correlation: '-0.22',
+      pValue: '0.05',
+    },
+    {
+      id: 'facial-variance',
+      name: 'General facial intensity',
+      detail: 'Variance over time',
+      control: '0.12',
+      asc: '0.19',
+      correlation: '0.25',
+      pValue: '0.04',
+    },
+  ],
+  vocal: [
+    {
+      id: 'pitch-variance',
+      name: 'Pitch',
+      detail: 'Variance',
+      control: '14.2',
+      asc: '21.1',
+      correlation: '0.38',
+      pValue: '0.02',
+    },
+    {
+      id: 'speed-mean',
+      name: 'Speed',
+      detail: 'Mean',
+      control: '1.25',
+      asc: '1.06',
+      correlation: '-0.31',
+      pValue: '0.03',
+    },
+    {
+      id: 'speed-variance',
+      name: 'Speed',
+      detail: 'Variance',
+      control: '0.09',
+      asc: '0.16',
+      correlation: '0.29',
+      pValue: '0.04',
+    },
+    {
+      id: 'loudness-variance',
+      name: 'Loudness',
+      detail: 'Variance',
+      control: '5.9',
+      asc: '7.4',
+      correlation: '0.26',
+      pValue: '0.04',
+    },
+  ],
+};
+
+const LEARNING_EXAMPLES = {
+  gaze: {
+    withoutAsc: gazeAscExample,
+    withAsc: gazeWithoutAscExample,
+  },
+  facial: {
+    withoutAsc: facialAscExample,
+    withAsc: facialWithoutAscExample,
+  },
+  vocal: {
+    withoutAsc: vocalAscExample,
+    withAsc: vocalWithoutAscExample,
+  },
+} as const;
 
 // --- Sub-components ---
 
@@ -602,7 +759,13 @@ const DataAssessmentView = () => {
   );
 };
 
-const DataModalityView = ({ modality }: { modality: Modality }) => {
+const DataModalityView = ({
+  modality,
+  activeMode,
+}: {
+  modality: Modality;
+  activeMode: ViewMode;
+}) => {
   const { t } = useTranslation();
   const label = t(`modalities.${modality}.label`);
   const description = t(`modalities.${modality}.description`);
@@ -832,6 +995,111 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
     );
   };
 
+  const renderLearningContent = (content: {
+    goal: string;
+    interpretation: string;
+    alerts: string[];
+    dataCollection: string;
+    clinicalTitle: string;
+    clinicalItems: { title: string; body: string }[];
+  }, stats: LearningStatRow[], exampleImages: { withoutAsc: string; withAsc: string }) => (
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Example Cases</h3>
+        <p className="text-sm text-gray-600 mb-6">
+          The case examples show exemplarily how a case with or without ASC might look in the visualization.
+        </p>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-3">
+            <div className="text-sm font-semibold text-gray-900">Person without ASC (exemplary)</div>
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <img src={exampleImages.withoutAsc} alt="Person without ASC example" className="w-full h-auto" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="text-sm font-semibold text-gray-900">Person with ASC (exemplary)</div>
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <img src={exampleImages.withAsc} alt="Person with ASC example" className="w-full h-auto" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Visual Interpretation</h2>
+        <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-gray-400 font-bold">Goal</div>
+            <p className="mt-2">{content.goal}</p>
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-widest text-gray-400 font-bold">Interpretation</div>
+            <p className="mt-2">{content.interpretation}</p>
+          </div>
+        </div>
+        <div className="mt-6 space-y-3">
+          {content.alerts.map((alert) => (
+            <div key={alert} className="flex items-start gap-3 p-4 bg-orange-50/50 rounded-lg border border-orange-100">
+              <AlertTriangle className="text-orange-500 shrink-0 mt-0.5" size={18} />
+              <p className="text-sm text-orange-800">{alert}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-2">Statistics</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          The values in the reference groups are averaged over time and the group and additionally give the variance within the respective groups in parentheses.
+        </p>
+        <div className="overflow-hidden rounded-xl border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500">
+                <th className="p-4 text-left font-semibold">Feature</th>
+                <th className="p-4 text-center font-semibold">Control Group</th>
+                <th className="p-4 text-center font-semibold">ASC</th>
+                <th className="p-4 text-center font-semibold">Correlation (r)</th>
+                <th className="p-4 text-center font-semibold">p value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.map((row) => (
+                <tr key={row.id} className="border-t border-gray-100">
+                  <td className="p-4 text-gray-700">
+                    <div className="font-semibold text-gray-900">{row.name}</div>
+                    <div className="text-xs text-gray-500">{row.detail}</div>
+                  </td>
+                  <td className="p-4 text-center text-gray-700">{row.control}</td>
+                  <td className="p-4 text-center text-gray-700">{row.asc}</td>
+                  <td className="p-4 text-center text-gray-700">{row.correlation}</td>
+                  <td className="p-4 text-center text-gray-700">{row.pValue}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{content.clinicalTitle}</h3>
+        <div className="space-y-4 text-sm text-gray-700">
+          {content.clinicalItems.map((item) => (
+            <div key={item.title}>
+              <div className="text-xs uppercase tracking-widest text-gray-400 font-bold">{item.title}</div>
+              <p className="mt-2">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-3">Data Collection</h3>
+        <p className="text-sm text-gray-700 leading-relaxed">{content.dataCollection}</p>
+      </section>
+    </div>
+  );
+
   const renderHeadContent = () => {
     if (!data) {
       return null;
@@ -961,6 +1229,102 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
     </div>
     );
   };
+
+  if (activeMode === 'learning' && (modality === 'gaze' || modality === 'facial' || modality === 'vocal')) {
+    const content = {
+      goal: 'Assess how often and how long the interviewed person focuses on the conversation partner in the video',
+      interpretation: 'The scatter plot shows the gaze behavior of the interviewed person on the screen, the conversation partner in the video, and the environment. A single point represents the accumulated time duration that the interviewed person looks at this location in total.',
+      alerts: [
+        'The vertical alignment may not be displayed correctly due to different body sizes of the recorded persons. Therefore, it is not a clear indication of a focus on the eyes or other facial areas.',
+        'Conspicuous gaze behavior can be an indication of other diagnoses than ASC.',
+      ],
+      dataCollection: '',
+      clinicalTitle: 'According to clinical classification systems and studies, social gaze behavior is relevant for ASC:',
+      clinicalItems: [
+        {
+          title: 'ICD-11',
+          body: 'Abnormalities in eye contact (including reduced intensity or frequency)',
+        },
+        {
+          title: 'DSM-5',
+          body: 'Abnormalities in eye contact',
+        },
+        {
+          title: 'ADOS',
+          body: 'Unusual eye contact (Reciprocal social interaction)',
+        },
+        {
+          title: 'Studies',
+          body: 'Increased fixation on the facial region correlates with better social behavior (Source). Gaze behavior among ASC diagnosed individuals is heterogeneous (Source).',
+        },
+      ],
+    };
+
+    if (modality === 'facial') {
+      content.goal = 'Assess positive expression intensity during interaction with the conversation partner in the video';
+      content.interpretation = 'The line chart shows the intensity of positive facial expressions (smiling) over time. The visualization is divided into three temporal phases - "Setting the table", "Liked food" and "Disliked food". Based on the line progression, the variability of positive facial expressions can be assessed. The current case can be compared with the data distribution of a selected reference group. The gray areas show the 1st and 2nd standard deviation of the respective reference group.';
+      content.alerts = [
+        'If persons wear glasses or masks, facial expressions cannot be fully captured.',
+        'If the interviewed person has an inconspicuous facial expression, this can also be due to "masking".',
+      ];
+      content.clinicalTitle = 'According to clinical classification systems, facial expressions are relevant for ASC:';
+      content.clinicalItems = [
+        {
+          title: 'ICD-11',
+          body: 'Abnormalities in facial expressions (including reduced intensity or frequency)',
+        },
+        {
+          title: 'DSM-5',
+          body: 'Lack of facial expressions, ritualized patterns of non-verbal behavior',
+        },
+        {
+          title: 'ADOS',
+          body: 'Facial expressions directed at the conversation partner in the video, shared joy in interaction (Reciprocal social interaction)',
+        },
+        {
+          title: 'Studies',
+          body: 'Meta-analysis shows differences in frequency, duration and described quality of facial expressions in people with ASC (Source).',
+        },
+      ];
+      content.dataCollection = 'The intensity of individual facial expressions was captured using AI based on video data. The intensity of positive facial expressions results from two "Action Units" that consider the activation of facial muscles. The intensity of the "cheek raiser" (eye smile) and the "lip corner puller" (mouth corner smile) are considered together.';
+    }
+
+    if (modality === 'vocal') {
+      content.goal = 'Enables comparison of voice parameters with a reference group.';
+      content.interpretation = 'The violin visualizations show the variability of the person\'s pitch in the three phases of the SIT. In these, "Setting the table", "Liked food" or "Disliked food" is discussed. The current case can be compared with the data distribution of a selected reference group. The continuous line shows the median of the reference group, meaning 50% of the reference group values are below or above this value. The dashed lines indicate the interquartile range, in which 50% of the persons in the reference group lie.';
+      content.alerts = [
+        'Values deviating from the reference group can also indicate other diagnoses (example: flat affect in depression).',
+        'There is no threshold value that clearly indicates ASC.',
+      ];
+      content.clinicalTitle = 'According to clinical classification systems, prosody is relevant for ASC:';
+      content.clinicalItems = [
+        {
+          title: 'ICD-11',
+          body: 'More monotonous prosody or emotional tone (including variation in pitch, speech rate, volume)',
+        },
+        {
+          title: 'DSM-5',
+          body: 'Poorly adapted verbal and non-verbal communication',
+        },
+        {
+          title: 'ADOS',
+          body: 'Language abnormalities (Language and communication)',
+        },
+        {
+          title: 'Studies',
+          body: 'Meta-analyses show significant differences in pitch variability (Source).',
+        },
+      ];
+      content.dataCollection = 'All three prosody parameters are derived from audio data. The variability of pitch is calculated from the variance of frequency (number of oscillations per second) over the interaction per phase. The speech rate (see statistics) is calculated as the number of syllables per second. For speech volume (see statistics), the variance of the oscillation amplitudes (maximum deflections) is calculated.';
+    }
+
+    if (modality === 'gaze') {
+      content.dataCollection = "Based on the position of the eyes and pupil, the gaze direction is estimated. Based on the person's gaze direction, it is then estimated where the person is looking on the screen. The gaze angle at which a person looks at the screen is calculated per time unit. This allows us to specify where, at what time, and for how long they look.";
+    }
+
+    const exampleImages = LEARNING_EXAMPLES[modality];
+    return renderLearningContent(content, LEARNING_STATS[modality], exampleImages);
+  }
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -1211,21 +1575,6 @@ export default function App() {
               </div>
             )}
 
-            {isModelRoute && (
-              <div className="flex-1 space-y-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
-                {modes.map((mode) => (
-                  <ModeButton 
-                    key={mode.id}
-                    active={activeMode === mode.id}
-                    onClick={() => setActiveMode(mode.id)}
-                    icon={mode.icon}
-                    label={mode.label}
-                    description={mode.desc}
-                  />
-                ))}
-              </div>
-            )}
 
             <div className="mt-auto pt-6 border-t border-gray-200">
               <div className="p-4 bg-teal-900 rounded-xl text-white">
@@ -1242,7 +1591,7 @@ export default function App() {
         )}
 
         {/* Mobile Mode Switcher (Tab-like) */}
-        {!isWelcomeRoute && (isDataRoute ? (
+        {!isWelcomeRoute && isDataRoute && (
           <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
             {modalities.map((modality) => (
               <button
@@ -1259,24 +1608,7 @@ export default function App() {
               </button>
             ))}
           </div>
-        ) : (
-          <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
-            {modes.map((mode) => (
-              <button
-                key={mode.id}
-                onClick={() => setActiveMode(mode.id)}
-                className={`flex-none px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
-                  activeMode === mode.id
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-white text-gray-600 border border-gray-200'
-                }`}
-              >
-                <mode.icon size={16} />
-                {mode.label}
-              </button>
-            ))}
-          </div>
-        ))}
+        )}
 
         {/* Main Content */}
         <main className="flex-1 bg-white overflow-y-auto">
@@ -1286,11 +1618,11 @@ export default function App() {
               activeMode={activeMode}
               onSelectMode={(mode) => {
                 setActiveMode(mode);
-                setRoutePath('model');
+                setRoutePath('data');
               }}
             />
           ) : isDataRoute ? (
-            activeModality ? <DataModalityView modality={activeModality} /> : <DataAssessmentView />
+            activeModality ? <DataModalityView modality={activeModality} activeMode={activeMode} /> : <DataAssessmentView />
           ) : (
             <>
               {activeMode === 'screening' && <ScreeningView />}
