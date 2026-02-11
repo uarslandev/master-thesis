@@ -1,0 +1,18 @@
+title SIT-Based ASC Screening System with JWT Authentication
+
+participant VMC
+participant Frontend
+participant Clinician
+
+note over VMC: Luigi triggers SIT data processing
+VMC->VMC: Processes video & extracts features
+VMC->Frontend: POST results (internal auth)
+note over Frontend: Stores results temporarily
+Frontend->Frontend: Generates JWT token (expires in 24h)
+Frontend->Clinician: Sends email with JWT link
+note over Clinician: Receives email with secure link
+
+Clinician->Frontend: Clicks link (JWT in URL)
+Frontend->Frontend: Validates JWT token
+Frontend->Clinician: Displays SIT results dashboard
+note over Frontend: Results auto-delete after expiry

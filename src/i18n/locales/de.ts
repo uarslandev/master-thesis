@@ -3,6 +3,18 @@ export default {
     dataAssessment: "Datenbasierte Bewertung",
     modelAssessment: "Modellbasierte Bewertung",
   },
+  welcome: {
+    title: "Willkommen bei SIT-CARE",
+    whatTitle: "Was ist SIT-CARE?",
+    whatBody: "SIT-CARE ist ein innovatives Software-Tool zur Analyse sozialer Interaktion. Teilnehmende führen einen videobasierten Dialog mit einer Schauspielerin und werden dabei aufgezeichnet. Das Gespräch umfasst verschiedene Themen, die emotionale und soziale Reaktionen hervorrufen sollen.",
+    howTitle: "Wie funktioniert SIT-CARE?",
+    howBody: "Die Software erkennt und analysiert automatisch Verhaltensmarker wie Gesichtsausdruck, Blickrichtung, Kopfbewegungen und Stimmprosodie. Die Ergebnisse werden als Visualisierungen oder KI-basierte Empfehlungen dargestellt.",
+    chooseTitle: "Analysemodus wählen",
+    chooseBody: "Wählen Sie unten einen Analysemodus, um Ihre modellbasierte Bewertung zu starten. Sie können ihn später in den Einstellungen (Zahnrad-Symbol) ändern.",
+  },
+  settings: {
+    analysisMode: "Analysemodus",
+  },
   sidebar: {
     currentPatient: "Aktueller Patient",
     lastAssessment: "Letzte Bewertung",

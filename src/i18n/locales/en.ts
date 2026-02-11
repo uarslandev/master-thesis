@@ -3,6 +3,18 @@ export default {
     dataAssessment: "Data-based Assessment",
     modelAssessment: "Model-based Assessment",
   },
+  welcome: {
+    title: "Welcome to SIT-CARE",
+    whatTitle: "What is SIT-CARE?",
+    whatBody: "SIT-CARE is an innovative software tool for analyzing social interaction. Participants engage in a video-based dialogue with an actress and are recorded during the process. The conversation covers various topics designed to elicit emotional and social responses.",
+    howTitle: "How does SIT-CARE work?",
+    howBody: "The software automatically recognizes and analyzes behavioral markers such as facial expressions, gaze direction, head movements, and voice prosody. The results are presented as visualizations or AI-based recommendations.",
+    chooseTitle: "Choose an analysis mode",
+    chooseBody: "Select an analysis mode below to start your model-based assessment. You can change this later in Settings (gear icon).",
+  },
+  settings: {
+    analysisMode: "Analysis Mode",
+  },
   sidebar: {
     currentPatient: "Current Patient",
     lastAssessment: "Last Assessment",

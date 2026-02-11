@@ -34,6 +34,15 @@ import {
 import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './components/ui/dropdown-menu';
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -43,8 +52,15 @@ import {
 
 // --- Types ---
 type ViewMode = 'screening' | 'learning' | 'assessment';
-type RouteView = 'model' | 'data';
+type RouteView = 'welcome' | 'model' | 'data';
 type Modality = 'gaze' | 'facial' | 'vocal' | 'head' | 'mimicry';
+
+type ModeOption = {
+  id: ViewMode;
+  label: string;
+  icon: any;
+  desc: string;
+};
 
 // --- Mock Data ---
 const CONFUSION_MATRIX = [
@@ -137,6 +153,66 @@ const ConfusionMatrix = () => {
 };
 
 // --- Mode Views ---
+
+const WelcomeView = ({
+  modes,
+  activeMode,
+  onSelectMode,
+}: {
+  modes: ModeOption[];
+  activeMode: ViewMode;
+  onSelectMode: (mode: ViewMode) => void;
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="p-8 max-w-6xl mx-auto space-y-10">
+      <section className="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-cyan-50 p-8 shadow-sm">
+        <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-teal-200/40 blur-2xl" />
+        <div className="absolute -left-12 bottom-0 h-32 w-32 rounded-full bg-cyan-200/40 blur-2xl" />
+        <div className="relative space-y-6 motion-safe:animate-[welcome-fade_0.6s_ease-out_0s_both]">
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+              {t('welcome.title')}
+            </h1>
+            <div className="space-y-5 text-sm text-gray-700 leading-relaxed">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('welcome.whatTitle')}</h2>
+                <p>{t('welcome.whatBody')}</p>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-2">{t('welcome.howTitle')}</h2>
+                <p>{t('welcome.howBody')}</p>
+              </div>
+            </div>
+        </div>
+      </section>
+
+      <section className="space-y-4 motion-safe:animate-[welcome-fade_0.6s_ease-out_0.2s_both]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm">
+            <Settings size={18} />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">{t('welcome.chooseTitle')}</h3>
+            <p className="text-sm text-gray-600">{t('welcome.chooseBody')}</p>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {modes.map((mode) => (
+            <ModeButton
+              key={mode.id}
+              active={activeMode === mode.id}
+              onClick={() => onSelectMode(mode.id)}
+              icon={mode.icon}
+              label={mode.label}
+              description={mode.desc}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
 
 const ScreeningView = () => {
   const { t } = useTranslation();
@@ -922,10 +998,11 @@ const DataModalityView = ({ modality }: { modality: Modality }) => {
 
 export default function App() {
   const getRouteStateFromPath = (path: string): { route: RouteView; modality: Modality | null } => {
-    if (path === '/' || path.startsWith('/data-assessment')) {
-      if (path === '/') {
-        return { route: 'data', modality: null };
-      }
+    if (path === '/' || path.startsWith('/welcome')) {
+      return { route: 'welcome', modality: null };
+    }
+
+    if (path.startsWith('/data-assessment')) {
 
       const parts = path.split('/').filter(Boolean);
       const maybeModality = parts[1];
@@ -941,20 +1018,22 @@ export default function App() {
       return { route: 'model', modality: null };
     }
 
-    return { route: 'data', modality: null };
+    return { route: 'welcome', modality: null };
   };
 
   const initialRouteState = typeof window === 'undefined'
-    ? { route: 'data', modality: null }
+    ? { route: 'welcome', modality: null }
     : getRouteStateFromPath(window.location.pathname);
   const [routeState, setRouteState] = useState(initialRouteState);
   const [activeMode, setActiveMode] = useState<ViewMode>('screening');
   const { t } = useTranslation();
 
   const setRoutePath = (nextRoute: RouteView, nextModality: Modality | null = null) => {
-    const nextPath = nextRoute === 'data'
-      ? `/data-assessment${nextModality ? `/${nextModality}` : ''}`
-      : '/model';
+    const nextPath = nextRoute === 'welcome'
+      ? '/'
+      : nextRoute === 'data'
+        ? `/data-assessment${nextModality ? `/${nextModality}` : ''}`
+        : '/model';
     window.history.pushState({}, '', nextPath);
     setRouteState({ route: nextRoute, modality: nextModality });
   };
@@ -970,7 +1049,7 @@ export default function App() {
 
   console.log("App component rendering");
 
-  const modes = [
+  const modes: ModeOption[] = [
     { 
       id: 'screening', 
       label: t('modes.screening.label'), 
@@ -989,9 +1068,11 @@ export default function App() {
       icon: Stethoscope, 
       desc: t('modes.assessment.description') 
     },
-  ] as const;
+  ];
 
+  const isWelcomeRoute = routeState.route === 'welcome';
   const isDataRoute = routeState.route === 'data';
+  const isModelRoute = routeState.route === 'model';
   const activeModality = routeState.modality;
 
   const modalities = [
@@ -1032,12 +1113,17 @@ export default function App() {
       {/* Header */}
       <header className="h-20 bg-[#121212] flex items-center justify-between px-8 border-b border-gray-800 sticky top-0 z-50">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setRoutePath('welcome')}
+            className="flex items-center gap-2 focus:outline-hidden hover:opacity-90 transition-opacity"
+            aria-label={t('welcome.title')}
+          >
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
               <Brain className="text-black" size={24} />
             </div>
             <span className="text-white font-black text-xl tracking-tight">SIT-CARE</span>
-          </div>
+          </button>
           
           <nav className="hidden md:flex items-center bg-white/10 p-1 rounded-xl ml-4">
             <button
@@ -1052,7 +1138,7 @@ export default function App() {
             </button>
             <button
               className={`px-4 py-2 text-sm font-semibold transition-colors ${
-                !isDataRoute
+                isModelRoute
                   ? 'text-white bg-teal-600 rounded-lg shadow-lg'
                   : 'text-gray-400 hover:text-white'
               }`}
@@ -1066,70 +1152,97 @@ export default function App() {
         <div className="flex items-center gap-4 text-gray-400">
           <LanguageSwitcher />
           <button className="p-2 hover:bg-white/10 rounded-full transition-colors"><User size={20} /></button>
-          <button className="p-2 hover:bg-white/10 rounded-full transition-colors"><Settings size={20} /></button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label={t('settings.analysisMode')}>
+                <Settings size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-[#1e1e1e] border-gray-700">
+              <DropdownMenuLabel className="text-gray-300">{t('settings.analysisMode')}</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-700" />
+              <DropdownMenuRadioGroup
+                value={activeMode}
+                onValueChange={(value) => setActiveMode(value as ViewMode)}
+              >
+                {modes.map((mode) => (
+                  <DropdownMenuRadioItem
+                    key={mode.id}
+                    value={mode.id}
+                    className="cursor-pointer text-gray-300 hover:text-white hover:bg-white/10"
+                  >
+                    <mode.icon size={14} />
+                    {mode.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       <div className="flex min-h-[calc(100vh-80px)]">
         {/* Sidebar */}
-        <aside className="w-72 bg-gray-50 border-r border-gray-100 flex flex-col p-6 overflow-y-auto hidden lg:flex">
-          <div className="mb-8">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.currentPatient')}</label>
-            <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
-              <div className="font-black text-xl text-gray-900 mb-1">G532XHW</div>
-              <div className="text-xs text-gray-500">{t('sidebar.lastAssessment')}: Jan 27, 2026</div>
-            </div>
-          </div>
-
-          {isDataRoute && (
+        {!isWelcomeRoute && (
+          <aside className="w-72 bg-gray-50 border-r border-gray-100 flex flex-col p-6 overflow-y-auto hidden lg:flex">
             <div className="mb-8">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.modality')}</label>
-              <div className="space-y-2">
-                {modalities.map((modality) => (
-                  <ModeButton
-                    key={modality.id}
-                    active={activeModality === modality.id}
-                    onClick={() => setRoutePath('data', modality.id)}
-                    icon={modality.icon}
-                    label={modality.label}
-                    description={modality.desc}
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.currentPatient')}</label>
+              <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                <div className="font-black text-xl text-gray-900 mb-1">G532XHW</div>
+                <div className="text-xs text-gray-500">{t('sidebar.lastAssessment')}: Jan 27, 2026</div>
+              </div>
+            </div>
+
+            {isDataRoute && (
+              <div className="mb-8">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.modality')}</label>
+                <div className="space-y-2">
+                  {modalities.map((modality) => (
+                    <ModeButton
+                      key={modality.id}
+                      active={activeModality === modality.id}
+                      onClick={() => setRoutePath('data', modality.id)}
+                      icon={modality.icon}
+                      label={modality.label}
+                      description={modality.desc}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isModelRoute && (
+              <div className="flex-1 space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
+                {modes.map((mode) => (
+                  <ModeButton 
+                    key={mode.id}
+                    active={activeMode === mode.id}
+                    onClick={() => setActiveMode(mode.id)}
+                    icon={mode.icon}
+                    label={mode.label}
+                    description={mode.desc}
                   />
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {!isDataRoute && (
-            <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.analysisMode')}</label>
-              {modes.map((mode) => (
-                <ModeButton 
-                  key={mode.id}
-                  active={activeMode === mode.id}
-                  onClick={() => setActiveMode(mode.id)}
-                  icon={mode.icon}
-                  label={mode.label}
-                  description={mode.desc}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="mt-auto pt-6 border-t border-gray-200">
-            <div className="p-4 bg-teal-900 rounded-xl text-white">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300">{t('sidebar.aiStatus')}</span>
-              </div>
-              <div className="text-xs font-medium leading-relaxed">
-                {t('sidebar.modelActive')}
+            <div className="mt-auto pt-6 border-t border-gray-200">
+              <div className="p-4 bg-teal-900 rounded-xl text-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300">{t('sidebar.aiStatus')}</span>
+                </div>
+                <div className="text-xs font-medium leading-relaxed">
+                  {t('sidebar.modelActive')}
+                </div>
               </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        )}
 
         {/* Mobile Mode Switcher (Tab-like) */}
-        {isDataRoute ? (
+        {!isWelcomeRoute && (isDataRoute ? (
           <div className="lg:hidden flex overflow-x-auto p-4 gap-2 bg-gray-50 border-b border-gray-100">
             {modalities.map((modality) => (
               <button
@@ -1163,11 +1276,20 @@ export default function App() {
               </button>
             ))}
           </div>
-        )}
+        ))}
 
         {/* Main Content */}
         <main className="flex-1 bg-white overflow-y-auto">
-          {isDataRoute ? (
+          {isWelcomeRoute ? (
+            <WelcomeView
+              modes={modes}
+              activeMode={activeMode}
+              onSelectMode={(mode) => {
+                setActiveMode(mode);
+                setRoutePath('model');
+              }}
+            />
+          ) : isDataRoute ? (
             activeModality ? <DataModalityView modality={activeModality} /> : <DataAssessmentView />
           ) : (
             <>
