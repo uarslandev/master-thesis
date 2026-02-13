@@ -1,35 +1,35 @@
 import {
-    Activity,
-    AlertTriangle,
-    Brain,
-    Eye,
-    Fingerprint,
-    GraduationCap,
-    Info,
-    Layers,
-    Mic,
-    Move,
-    Settings,
-    Smile,
-    Stethoscope,
-    Theater,
-    User
+  Activity,
+  AlertTriangle,
+  Brain,
+  Eye,
+  Fingerprint,
+  GraduationCap,
+  Info,
+  Layers,
+  Mic,
+  Move,
+  Settings,
+  Smile,
+  Stethoscope,
+  Theater,
+  User
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    CartesianGrid,
-    Line,
-    LineChart,
-    PolarAngleAxis,
-    PolarGrid,
-    PolarRadiusAxis,
-    Radar,
-    RadarChart,
-    Tooltip as ReChartsTooltip,
-    ResponsiveContainer,
-    XAxis,
-    YAxis
+  CartesianGrid,
+  Line,
+  LineChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
+  Tooltip as ReChartsTooltip,
+  ResponsiveContainer,
+  XAxis,
+  YAxis
 } from 'recharts';
 import facialAscExample from '../data/images/facial-asc.svg';
 import facialWithoutAscExample from '../data/images/facial-without-asc.svg';
@@ -40,20 +40,20 @@ import vocalWithoutAscExample from '../data/images/vocal-without-asc.svg';
 import { modalityData } from '../data/modalityData';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from './components/ui/dropdown-menu';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from './components/ui/select';
 
 // --- Types ---
@@ -1549,13 +1549,15 @@ export default function App() {
         {/* Sidebar */}
         {!isWelcomeRoute && (
           <aside className="w-72 bg-gray-50 border-r border-gray-100 flex flex-col p-6 overflow-y-auto hidden lg:flex">
-            <div className="mb-8">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.currentPatient')}</label>
-              <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
-                <div className="font-black text-xl text-gray-900 mb-1">G532XHW</div>
-                <div className="text-xs text-gray-500">{t('sidebar.lastAssessment')}: Jan 27, 2026</div>
+            {activeMode !== 'learning' && (
+              <div className="mb-8">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">{t('sidebar.currentPatient')}</label>
+                <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                  <div className="font-black text-xl text-gray-900 mb-1">G532XHW</div>
+                  <div className="text-xs text-gray-500">{t('sidebar.lastAssessment')}: Jan 27, 2026</div>
+                </div>
               </div>
-            </div>
+            )}
 
             {isDataRoute && (
               <div className="mb-8">

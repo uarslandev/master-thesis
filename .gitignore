@@ -140,3 +140,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Generated PDF text extracts
+thesis/pdfs_txt/

@@ -1,0 +1,133 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[backend=biber, style=numeric]{biblatex} 
+\addbibresource{export-data.bib}
+
+\setstretch{1.15}
+\parindent0mm
+
+\title{Human-Centered Interface Design for AI-Assisted Screening and Assessment}
+\author{Umut Arslan}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction and Background}
+
+Autism Spectrum Condition (ASC) is a set of neurodevelopmental differences that affect social communication, interaction, and the expression of restricted or repetitive behaviors. Diagnosing autism in adults is particularly challenging. This is due to the fact that the presentation of symptoms is often subtle. Furthermore, many individuals develop compensatory strategies, such as camouflaging, to mask their difficulties \cite{drimalla_towards_2020, anonymous2026clinicians}.
+
+The main tools for diagnosing autism, like the Autism Diagnostic Observation Schedule (ADOS) and the Autism Diagnostic Interview-Revised (ADI-R), require extensive training, take a lot of time, and rely heavily on clinicians’ observations \cite{drimalla_towards_2020}.
+
+The growing demand for timely and accurate autism diagnosis in adults has sparked interest in developing technology-assisted tools that can augment clinical decision-making \cite{anonymous2026clinicians}. Recent advancements in machine learning (ML) and computer vision offer promising avenues for automating the extraction and analysis of behavioral markers associated with ASC. In particular, video-based analysis of non-verbal social behavior—such as facial expressivity, gaze patterns, vocal prosody, and head movement—provides a rich, objective data source that can complement traditional clinical evaluations\cite{anonymous2026clinicians}.
+
+The Simulated Interaction Task (SIT) is a standardized paradigm where participants interact with a pre-recorded actor, allowing for the consistent collection of multimodal data such as facial expressions, prosody, and gaze \cite{drimalla_towards_2020, saakyan_improving_2025}. Research has validated the SIT’s ability to differentiate autistic from non-autistic adults, with diagnostic accuracy reaching 74\% through recent advancements in multimodal fusion and gaze analysis \cite{drimalla_towards_2020, saakyan_improving_2025, saakyan_scalable_2023}. These developments demonstrate the potential of computational behavioral analysis to provide reliable digital biomarkers for clinical assessment.
+
+To bridge the gap between research and practice, AI-based Clinical Decision Support Systems (CDSS) like SIT-CARE have been developed to integrate these ML models into the diagnostic process \cite{anonymous2026clinicians}. Previous evaluations of SIT-CARE have focused on model performance, clinician trust, and the impact of AI assistance on diagnostic accuracy. However, a critical gap remains in the design of clinician-centered user interfaces that effectively accommodate varying clinical workflows, expertise levels, and diagnostic objectives \cite{anonymous2026clinicians}.
+
+Current clinical feedback highlights a need for flexibility: experienced diagnosticians often prioritize concise, interpretable insights, while trainees may require detailed, exploratory interfaces for educational support. Consequently, the successful implementation of such tools depends on balancing automation with clinical oversight while minimizing cognitive workload \cite{anonymous2026clinicians}.
+
+This thesis aims to advance AI-assisted assessment by focusing on the design and evaluation of clinician-centered interfaces for SIT-CARE. By drawing on findings from large-scale validation trials (e.g., Tebartz van Elst et al., 2021) \cite{tebartz_van_elst_faster_2021} and state-of-the-art multimodal ML research (e.g., Saakyan et al., 2023, 2024) \cite{saakyan_scalable_2023, saakyan_improving_2025}, this thesis will explore how interface design can enhance the utility, acceptance, and effectiveness of AI support in clinical practice across different user profiles and diagnostic scenarios.\section{Objectives and Research Questions}
+
+The primary objective of this thesis is to design and justify user interface concepts for an AI-supported clinical decision support system based on SIT data, tailored to different clinical use cases and clinician expertise levels.
+
+The thesis addresses the following research questions:
+
+\begin{itemize}
+    \item \textbf{RQ1:} How can clinician-centered user interfaces present AI-supported screening and assessment outputs in ways that are interpretable, actionable, and aligned with clinical workflows?
+    \item \textbf{RQ2:} How can user interfaces be designed to support multiple clinical use cases (screening, learning, and in-depth assessment) while maintaining consistency and usability?
+    % \item \textbf{RQ3:} How can established HCI and medical decision-making design principles inform the design of AI-based diagnostic interfaces to support interpretability, trust, and usability?
+    \end{itemize}
+
+\section{Planned Methods}
+
+\subsection{Use Case Definition}
+
+Based on prior interviews and literature, three primary clinical use cases will be addressed:
+
+\begin{enumerate}
+    \item \textbf{Screening / Assessment Support:}  
+    Clinicians use the system after a patient has completed the SIT to support early-stage screening and decision-making.
+    
+    \item \textbf{Learning and Training:}  
+    Less experienced clinicians or nurses use the system to learn how non-verbal behavioral patterns relate to autism-related traits through explanatory visualizations and examples.
+    
+    \item \textbf{In-depth Assessment and Differential Diagnosis:}  
+    Clinicians explore detailed behavioral information for complex cases involving comorbidities (e.g., ADHD, depression), where diagnostic confidence is low.
+\end{enumerate}
+
+Each use case will be supported by a distinct UI mode with varying levels of detail, explanation, and visual complexity.
+
+\subsection{Qualitative Analysis}
+
+Semi-structured interview logs with clinicians (provided by the research group) will be analyzed using qualitative thematic analysis. The analysis will focus on identifying:
+
+\begin{itemize}
+    \item Required information and explanations for clinical decision-making
+    \item Preferences and challenges regarding data visualization
+    \item Differences in needs between experienced and less experienced clinicians
+\end{itemize}
+
+The qualitative findings will directly inform UI requirements and design decisions.
+
+\subsection{Design and Prototyping}
+
+Low- and high-fidelity mockups will be developed iteratively. Initial visualization concepts will be based on existing SIT-CARE designs and visual materials provided by the research group. The final contribution of this thesis will be the design of refined, coherent UI that integrates:
+
+\begin{itemize}
+    \item Clinician feedback from interviews
+    \item Design strategies identified in prior SIT-CARE research
+    \item Relevant literature on human-centered AI and medical decision support interfaces
+\end{itemize}
+
+\subsection{Optional Pilot Evaluation}
+
+If feasible within the thesis timeline, a small pilot study or expert walkthrough may be conducted to gather preliminary feedback on the proposed UI concepts.
+
+\section{Expected Results}
+
+The expected outcomes of this thesis include:
+
+\begin{itemize}
+    \item A set of well-defined clinical use cases for AI-supported assessment interfaces
+    \item Three UI modes tailored to screening, learning, and in-depth assessment scenarios
+    \item High-fidelity UI grounded in qualitative insights and literature
+    \item Design rationales linking UI elements to clinician needs and decision-making processes
+\end{itemize}
+
+All design artifacts and documentation will be delivered as part of the thesis.
+
+\section{Risks and Challenges}
+
+\begin{itemize}
+    
+    \item \textbf{Scope creep due to complex clinical requirements:}  
+    Mitigation: Clear separation of use cases and UI modes.
+    
+    \item \textbf{Ambiguity in translating qualitative insights into design decisions:}  
+    Mitigation: Systematic linkage between themes, design strategies, and UI elements.
+\end{itemize}
+
+\section{Timeline}
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\hline
+Phase & Month 1 & Month 2 & Month 3 & Month 4 & Month 5 & Month 6 \\
+\hline
+Literature Review      & X & X &   &   &   &   \\
+Qualitative Analysis   & X & X & X &   &   &   \\
+UI Concept Design      &   & X & X & X &   &   \\
+Mockup Development     &   &   & X & X & X &   \\
+Writing and Revision   &   &   &   & X & X & X \\
+\hline
+\end{tabular}
+\end{center}
+
+\printbibliography
+
+\end{document}

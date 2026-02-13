@@ -1,0 +1,1483 @@
+\documentclass[12pt,a4paper,titlepage]{article}
+
+% --- BASIC ENCODING & LANGUAGE ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel} % Change to 'ngerman' if writing in German
+
+% --- FONT SELECTION (Times New Roman) ---
+\usepackage{mathptmx}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{footmisc}
+\renewcommand{\footnotelayout}{\fontsize{10}{12}\selectfont}
+
+% --- PAGE MARGINS (Uni Bonn Guideline) ---
+\usepackage[a4paper,left=3cm,right=2cm,top=2cm,bottom=2cm,bindingoffset=5mm]{geometry}
+
+\usepackage{amsmath, amssymb}
+\usepackage{physics}
+\usepackage{bm}       % Bold math
+\usepackage{dsfont}   % Double stroke fonts
+\usepackage{amsthm}
+
+% --- IMAGES & TABLES ---
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{booktabs} % For nicer tables
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% --- UTILITIES ---
+\usepackage{xcolor}
+\usepackage[plainpages=false, hidelinks]{hyperref} % Clickable links, no colored boxes
+\usepackage{cleveref} % Better referencing (must be loaded after hyperref)
+\usepackage[verbose]{placeins} % Keeps floats in their sections
+\usepackage{appendix}
+\usepackage{lipsum} % Just for dummy text in this template (can be removed)
+
+
+\makeatletter
+\def\tagform@#1{\maketag@@@{\ignorespaces#1\unskip\@@italiccorr}}
+\let\orgtheequation\theequation
+\def\theequation{(\orgtheequation)}
+\makeatother
+\let\orgautoref\autoref
+\providecommand{\Autoref}[1]{\def\equationautorefname{Equation}\orgautoref{#1}}
+\renewcommand{\autoref}[1]{\def\equationautorefname{Eq.}\orgautoref{#1}}
+
+
+% --- BIBLIOGRAPHY ---
+\usepackage{csquotes}
+\usepackage[backend=biber, style=authoryear, sorting=nty]{biblatex}
+\addbibresource{literature.bib} % Make sure this file exists
+
+\setcounter{tocdepth}{2}
+
+
+
+%Based on the Merkblatt zu den stilistischen/formalen Vorgaben der Bachelorarbeit (27.01.2026) https://www.econ.uni-bonn.de/examinations/de/informationen/bachelor/bachelorarbeit/dokumente/ba-merkblatt-2016-05-23.pdf
+
+% --- DOCUMENT INFO ---
+\title{Human-Centered Interface Design for AI-Assisted Screening and Assessment}
+\author{Fatih Umut Can Arslan}
+\date{\today}
+
+% =========================================
+% BEGIN DOCUMENT
+% =========================================
+\begin{document}
+
+% --- Title Page ---
+
+\begin{titlepage}
+	\begin{center}
+		  \par
+		\vspace*{2cm}
+		{\LARGE \textsc{Human-Centered Interface Design for AI-Assisted Screening and Assessment}}
+		\par
+		\vspace{4.5cm}
+		\par
+        
+		{\textsc{Master's thesis presented to the}}\\
+        {\textsc{Faculty of Technology at the}}\\
+        {\textsc{Universität Bielefeld}}\\
+            \vspace*{1cm}
+		{\textsc{In partial fulfilment of the requirements for  the degree of}}
+            {\textsc{Master of Science (M.Sc.)}}
+		\par
+		\vspace{5.25cm}
+        {\textsc{Supervisors:} Prof.\ Dr.\ Hanna\ Drimalla \\ William\ Saakyan}\\
+		\vspace{0.5cm}
+		\par
+		%\vfill
+		\vspace{1cm}
+        {\textsc{Submitted in February 2026 by} \\ Fatih\ Umut\ Can\ Arslan \\ Matriculation Number: 4388923}\\
+		%\vspace{2cm}
+		\end{center}
+\end{titlepage}
+	
+\thispagestyle{empty}
+
+\pagenumbering{roman} % Roman numerals for lists (i, ii, iii)
+
+% --- Abstract ---
+\newpage
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+
+Autism Spectrum Condition (ASC) diagnosis in adults poses significant challenges due to subtle symptom presentation and compensatory behaviors like camouflaging. Traditional diagnostic tools such as ADOS and ADI-R require extensive training and time-intensive clinical observations. This thesis addresses the design and implementation of SIT-CARE, a human-centered Clinical Decision Support System (CDSS) that leverages machine learning and multimodal behavioral analysis to support clinicians in ASC screening and assessment.
+
+Building upon the Simulated Interaction Task (SIT) paradigm, which enables standardized collection of behavioral data including facial expressions, gaze patterns, vocal prosody, and head movements, this work focuses on translating computational models into clinically useful interfaces. Through systematic analysis of clinician needs and established human-computer interaction principles, three distinct user interface modes were designed: Screening Mode for rapid assessment support, Learning Mode for educational exploration, and Assessment Mode for detailed diagnostic investigation.
+
+The work develops a web-based prototype of the clinician-facing interface, focusing on interaction patterns for multimodal feature visualization, AI-generated recommendations with uncertainty quantification, and interactive data exploration. The system design includes privacy-preserving access via time-limited tokens (JWT) to support controlled result sharing.
+
+This thesis contributes: (1) a comprehensive set of design requirements derived from clinician interviews and HCI literature, (2) a web-based prototype exploring three usage modes with internationalization support, (3) architectural documentation of a privacy-preserving assessment pipeline, and (4) design rationales linking interface elements to clinical decision-making needs. The work demonstrates how thoughtful interface design can help bridge the gap between ML model outputs and clinical utility.
+
+\textbf{Keywords:} Human-Computer Interaction, Clinical Decision Support Systems, Autism Spectrum Condition, Multimodal Machine Learning, User Interface Design, Medical AI
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\listoffigures
+\addcontentsline{toc}{section}{List of Figures}
+\newpage
+
+\listoftables
+\addcontentsline{toc}{section}{List of Tables}
+\newpage
+
+\cleardoublepage
+\pagenumbering{arabic} % Arabic numerals (1, 2, 3) starting here
+\setcounter{page}{1}   % Force start at 1
+
+% --- MAIN CONTENT ---
+
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{Motivation and Context}
+\label{subsec:motivation}
+
+Autism Spectrum Condition (ASC) represents a set of neurodevelopmental differences characterized by distinctive patterns in social communication, interaction, and behavior. While early childhood diagnosis has received substantial attention, the assessment of autism in adults remains particularly challenging \parencite{drimalla2020b, saakyan2023a}. Adults with ASC may present subtle symptoms and develop compensatory strategies (often discussed as \emph{camouflaging}), which can mask underlying difficulties and complicate clinical recognition \parencite{drimalla2020b, saakyan2023a}.
+
+Traditional diagnostic instruments, including the Autism Diagnostic Observation Schedule (ADOS) and the Autism Diagnostic Interview-Revised (ADI-R), constitute the gold standard for ASC assessment. However, these tools demand extensive clinician training, substantial time investment, and rely heavily on subjective clinical observations \parencite{drimalla2020b, saakyan2025a}. This dependence on expert availability contributes to long waiting times and motivates interest in complementary, scalable approaches that can support assessment \parencite{saakyan2023a, saakyan2025a}.
+
+Recent advances in machine learning (ML) and computer vision offer promising opportunities to augment clinical decision-making through automated behavioral analysis. Video-based assessment of non-verbal social behavior—including facial expressivity, gaze patterns, vocal prosody, and head movement—provides rich, objective data that can complement traditional clinical evaluations \parencite{drimalla2020b, saakyan2025a}. These computational approaches do not aim to replace clinician judgment but rather to provide quantitative, reproducible measurements that inform and support diagnostic decisions, addressing clinicians' desire for more objective and less subjective assessment methods \parencite{saakyan2023a}.
+
+The Simulated Interaction Task (SIT) exemplifies this technological paradigm. In the SIT, participants engage with a pre-recorded actor in a standardized 7-minute simulated dialog, enabling consistent collection of multimodal behavioral data including facial expressions, gaze behavior, and vocal characteristics \parencite{drimalla2020b}. Validation studies have demonstrated the SIT's capability to differentiate autistic from non-autistic adults with diagnostic accuracy reaching 74\% (sensitivity 67\%, specificity 79\%) through multimodal fusion and advanced gaze analysis, with computational analysis outperforming majority vote and equaling clinical expert ratings \parencite{drimalla2020b, saakyan2025a}. Recent work with a large, gender-balanced dataset (168 ASC + 157 controls, 46\% female) and novel gaze descriptors has further improved performance \parencite{saakyan2025a}.
+
+Despite these technical achievements, a critical gap persists between ML model development and clinical adoption. AI-based Clinical Decision Support Systems (CDSS) must not only achieve statistical accuracy but also integrate into diverse clinical workflows, accommodate varying expertise levels, and present information in interpretable, actionable formats \parencite{bayor2025, kawamoto2020}. The SIT-CARE system represents an effort to bridge this gap through thoughtful, human-centered interface design.
+
+\subsection{Problem Statement}
+\label{subsec:problem}
+
+While computational models for ASC assessment demonstrate promising performance metrics, their clinical utility depends fundamentally on how information is presented to end users. A comprehensive review of CDSS design identified four key categories of challenges: (1) usability and user experience, (2) validity and reliability, (3) data quality and assurance, and (4) design and integration complexities \parencite{bayor2025}. Current implementations often focus primarily on model accuracy while giving insufficient attention to:
+
+\begin{itemize}
+    \item \textbf{Interface interpretability:} Clinicians require clear understanding of how AI recommendations are generated and what behavioral evidence supports them. Lack of interpretability directly contributes to mistrust in AI-assisted diagnostic systems \parencite{nasarian2024a}.
+    \item \textbf{Workflow integration:} Different clinical contexts (screening, education, detailed assessment) demand different interface designs and information granularity. Research shows that CDSS adoption depends critically on automatic provision within workflow, alignment with local care processes, and ease of access \parencite{kawamoto2020}. However, most CDSS remain stand-alone systems that fail to integrate with existing clinical information systems \parencite{bayor2025}.
+    \item \textbf{Expertise adaptation:} Experienced diagnosticians prioritize concise insights enabling rapid decision-making, while trainees benefit from detailed explanations supporting learning \parencite{saakyan2023a}.
+    \item \textbf{Trust calibration:} Users must understand system limitations and uncertainty to appropriately weight AI recommendations alongside other evidence. Interactive systems with feedback mechanisms are vital for reliability perception \parencite{nasarian2024a}.
+\end{itemize}
+
+Clinical feedback from preliminary evaluations indicates that a one-size-fits-all interface approach proves inadequate. Experienced clinicians report feeling overwhelmed by excessive detail during routine screening, while junior clinicians struggle with insufficient educational context for complex cases \parencite{saakyan2023a}. This mismatch between interface design and user needs risks either underutilization (when tools seem cumbersome) or misuse (when limitations are not sufficiently apparent). Research on CDSS adoption reveals that only 34.2\% of implemented systems achieve sustained uptake, with factors including system utility, workflow fit, ease of use, and individual factors influencing success \parencite{newton2025a}. Notably, workarounds emerge after 5 years of use, indicating that user needs and system interaction patterns evolve over time \parencite{newton2025a}.
+
+Furthermore, the integration of ML models into clinical practice raises important questions about human-AI collaboration. Effective CDSS design requires balancing automation with clinical oversight, providing appropriate explanations without cognitive overload, and supporting rather than supplanting professional judgment.
+
+\subsection{Research Objectives}
+\label{subsec:objectives}
+
+This thesis addresses the design and implementation of clinician-centered user interfaces for an AI-supported clinical decision support system based on SIT behavioral data. The work encompasses theoretical foundation, practical implementation, and validation of design decisions.
+
+The primary research questions guiding this investigation are:
+
+\begin{description}
+    \item[\textbf{RQ1:}] How can clinician-centered user interfaces present AI-supported screening and assessment outputs in ways that are interpretable, actionable, and aligned with clinical workflows?
+    
+    \item[\textbf{RQ2:}] How can user interfaces be designed to support multiple clinical use cases (screening, learning, and in-depth assessment) while maintaining consistency and usability?
+\end{description}
+
+To address these questions, this thesis pursues the following specific objectives:
+
+\begin{enumerate}
+    \item \textbf{Requirements Analysis:} Systematically derive interface requirements through analysis of clinician interviews and established HCI principles for medical decision support.
+    
+    \item \textbf{Use Case Definition:} Define and characterize three primary usage scenarios—Screening, Learning, and Assessment—each with distinct information needs and interaction paradigms.
+    
+    \item \textbf{Interface Design:} Develop comprehensive UI concepts that integrate multimodal behavioral data, AI recommendations, uncertainty visualization, and interactive exploration tools.
+    
+    \item \textbf{System Implementation:} Develop an initial web-based prototype implementing key parts of the designed interfaces with internationalization support.
+    
+    \item \textbf{Architecture Documentation:} Specify system architecture including data processing pipeline, authentication mechanisms, and privacy-preserving design patterns.
+    
+    \item \textbf{Design Validation:} Establish explicit linkages between interface elements, design principles, and clinical decision-making requirements.
+\end{enumerate}
+
+\subsection{Scope and Contributions}
+\label{subsec:scope}
+
+This thesis focuses specifically on the interface design layer of the SIT-CARE system. The underlying machine learning models for behavioral feature extraction and classification are taken as given, with this work examining how model outputs can be effectively communicated to clinical users.
+
+The scope explicitly includes:
+\begin{itemize}
+    \item User interface design for web-based clinical assessment systems
+    \item Visualization approaches for multimodal behavioral data
+    \item Interaction design for AI explanation and model transparency
+    \item Adaptation strategies for different clinical contexts and user expertise
+    \item Implementation of functional prototypes in modern web technologies
+\end{itemize}
+
+The scope explicitly excludes:
+\begin{itemize}
+    \item Development or optimization of ML models
+    \item Clinical validation studies with patient populations
+    \item Comprehensive user testing with clinician participants
+    \item Backend data processing infrastructure
+    \item Deployment and operational considerations
+\end{itemize}
+
+The primary contributions of this thesis are:
+
+\begin{enumerate}
+    \item \textbf{Design Requirements Catalog:} A structured compilation of interface requirements derived from clinician interviews and HCI literature, specifically addressing AI-supported autism assessment.
+    
+    \item \textbf{Multi-Mode Interface Architecture:} A cohesive design framework supporting three distinct usage modes—Screening, Learning, and Assessment—with explicit design rationales for mode-specific features.
+    
+    \item \textbf{Prototype Implementation:} A web application prototype implementing core parts of the designed interfaces using React, TypeScript, and modern UI component libraries, with internationalization support (English/German).
+    
+    \item \textbf{System Architecture Documentation:} Detailed specification of the end-to-end assessment pipeline, including JWT-based authentication for privacy-preserving result delivery.
+    
+    \item \textbf{Design Knowledge:} Transferable insights regarding interface design for AI-supported clinical decision-making, applicable beyond the specific context of autism assessment.
+\end{enumerate}
+
+\subsection{Thesis Structure}
+\label{subsec:structure}
+
+The remainder of this thesis is organized as follows:
+
+\textbf{Section 2 (Related Work)} reviews relevant literature on autism assessment, the Simulated Interaction Task, multimodal machine learning approaches, clinical decision support systems, and human-computer interaction principles for medical AI.
+
+\textbf{Section 3 (Methods)} describes the research methodology, including qualitative analysis approach, use case definition process, design and prototyping strategy, and implementation technologies.
+
+\textbf{Section 4 (Requirements Analysis)} presents findings from clinician interview analysis, establishing specific interface requirements organized by clinical use case and user expertise level.
+
+\textbf{Section 5 (System Design)} details the overall system architecture, including the data processing pipeline, authentication mechanism, and component structure, with emphasis on the sequence of operations from video capture to clinician interface.
+
+\textbf{Section 6 (Interface Design)} thoroughly documents the design of all three interface modes, explaining visualization choices, interaction patterns, and adaptive features with explicit reference to requirements and design principles.
+
+\textbf{Section 7 (Implementation)} describes technical implementation details, including frontend architecture, internationalization approach, component organization, and deployment considerations.
+
+\textbf{Section 8 (Discussion)} reflects on the design decisions, evaluates how well the implemented solution addresses the research questions, discusses limitations, and considers implications for clinical practice.
+
+\textbf{Section 9 (Conclusion)} summarizes key findings, contributions, and outlines directions for future work.
+
+\section{Related Work}
+\label{sec:related-work}
+
+\subsection{Autism Spectrum Condition and Clinical Assessment}
+\label{subsec:asc-assessment}
+
+Autism Spectrum Condition encompasses a heterogeneous set of neurodevelopmental differences affecting social communication and behavior. While childhood diagnosis protocols are well-established, adult assessment presents unique challenges \parencite{drimalla2020b, saakyan2023a}. Adults with ASC frequently develop compensatory mechanisms that obscure diagnostic features (often discussed as \emph{camouflaging} or \emph{masking}), complicating clinical recognition \parencite{drimalla2020b, saakyan2023a}.
+
+Traditional diagnostic instruments rely on structured clinical observation and caregiver interviews. The Autism Diagnostic Observation Schedule (ADOS) involves direct interaction with a trained clinician who evaluates social communication and restricted/repetitive behaviors, and the Autism Diagnostic Interview-Revised (ADI-R) provides developmental history through caregiver report. However, quantifying social interaction deficits remains challenging: Drimalla et al. describe how clinicians often rely on implicit expertise ("clinical gaze") and that practitioners need many years of training to acquire the required skills, which are difficult to standardize and validate \parencite{drimalla2020b}. Consequently, these assessments are resource-intensive and depend on access to trained experts \parencite{saakyan2025a}.
+
+Resource constraints significantly limit access to timely diagnosis. Recent work highlights long waiting times and the risk of missed cases or misdiagnosis---particularly in adults and females who may compensate for symptoms---which reinforces the motivation for objective and scalable tools that can complement expert assessment \parencite{saakyan2023a, saakyan2025a}. Beyond diagnosis, adult ASD care also faces limited evidence-based interventions in some settings; for example, Tebartz van Elst et al. describe a multi-center randomized controlled trial protocol (DRKS00017817) to evaluate FASTER and SCOTT\&EVA as interventions to improve social responsiveness in adults with high-functioning ASD \parencite{tebartzvanelst2021}.
+
+\subsection{The Simulated Interaction Task (SIT)}
+\label{subsec:sit-paradigm}
+
+The Simulated Interaction Task represents a standardized paradigm for eliciting and recording social interaction behaviors \parencite{drimalla2020b}. In the SIT, participants engage in a short, standardized simulated dialog with a video-recorded interaction partner, enabling automated analysis of facial expressions, gaze behavior, and voice characteristics \parencite{drimalla2020b}. Recent implementations structure the dialog into emotion-related segments (e.g., meal preparation, favorite foods, and disliked foods) and include both listening and speaking phases to elicit behavior across interaction roles \parencite{saakyan2025a}.
+
+Crucially, the SIT's standardization enables consistent data collection across participants and sites. Unlike live clinical interactions, which vary significantly based on clinician behavior, the SIT presents identical stimuli to all participants. This consistency facilitates both machine learning model development (by reducing confounding variables) and comparative behavioral analysis.
+
+Validation studies have demonstrated the SIT's clinical validity in large-scale trials \parencite{drimalla2020b, tebartzvanelst2021}. The initial study with 37 adults with ASD and 43 healthy controls achieved 73\% accuracy, 67\% sensitivity, and 79\% specificity using facial expressions and vocal characteristics alone, with automated analysis outperforming majority vote and equaling clinical expert ratings \parencite{drimalla2020b}. Subsequent work has refined the paradigm's implementation and established behavioral norms for both autistic and non-autistic populations, with key biomarkers including reduced social smiling and facial mimicry, as well as higher voice fundamental frequency and harmony-to-noise ratio \parencite{drimalla2020b}.
+
+\subsection{Multimodal Behavioral Analysis}
+\label{subsec:multimodal-ml}
+
+Computer vision and audio processing advances enable automated extraction of behavioral features from SIT recordings. Key modalities include:
+
+\textbf{Gaze Analysis:} Eye-tracking systems measure fixation patterns, including the proportion of time directed toward the interaction partner versus other screen regions. Atypical gaze behavior (e.g., reduced eye contact and gaze aversion) is discussed as a well-established ASC marker, but webcam-based gaze classification has historically shown limited performance; Saakyan et al. address this by introducing variability-focused gaze descriptors, improving gaze-based classification accuracy from 64\% to 69\% \parencite{saakyan2025a}. Clinicians find gaze heatmaps particularly intuitive for understanding attention patterns \parencite{saakyan2023a}.
+
+\textbf{Facial Expressivity:} Automated facial action unit detection quantifies micro-expressions, smile intensity, and overall facial movement. Reduced social smiling and facial mimicry represent common characteristics in ASC populations, with these features showing strong discriminative power \parencite{drimalla2020b}.
+
+\textbf{Vocal Prosody:} Pitch variance, rhythm, and intonation patterns can be extracted from audio. Higher voice fundamental frequency and harmony-to-noise ratio are characteristic of autistic speech patterns. Flat or unusual prosody frequently appears in autistic presentations \parencite{drimalla2020b}.
+
+\textbf{Head Movement:} Head pose estimation tracks coordination and movement patterns during social interaction, including nodding patterns and horizontal movement that correlate with engagement \parencite{saakyan2025a}.
+
+\textbf{Mimicry:} Measurement of automatic imitation of the interaction partner's expressions and movements, which typically occurs at lower rates in ASC. Cross-correlation and dynamic time warping (DTW) metrics quantify temporal correspondence between participant and interaction partner \parencite{saakyan2025a}.
+
+\textbf{Multimodal Fusion:} Research demonstrates that combining features across modalities achieves superior diagnostic accuracy compared to single-modality approaches \parencite{saakyan2023a, saakyan2025a}. The most comprehensive study to date used five modalities (facial expressions, voice prosody, head motion, heart rate variability, and gaze) with a large, gender-balanced dataset (168 ASC + 157 controls, 46\% female), achieving 74\% accuracy through late fusion \parencite{saakyan2025a}. This represents the most balanced autism dataset reported in the literature and demonstrates the value of multimodal integration.
+
+These computational approaches provide objective, quantitative measurements that complement subjective clinical observation, addressing clinicians' desire for "less subjective impression" and more standardized assessment \parencite{saakyan2023a}. However, model performance alone does not guarantee clinical utility; effective translation requires thoughtful interface design that presents these complex multimodal data in understandable, actionable formats.
+
+\subsection{Clinical Decision Support Systems}
+\label{subsec:cdss}
+
+Clinical Decision Support Systems aim to enhance healthcare quality by providing clinicians with patient-specific assessments and recommendations at appropriate decision points. A systematic review of CDSS design from a user-centered perspective identified that while UCD is the most widely adopted approach, systems face persistent challenges related to usability, validity, data quality, and integration complexity \parencite{bayor2025}. Notably, a subset of studies incorporating Explainable Artificial Intelligence (XAI) highlighted its emerging role in addressing validity and reliability challenges by fostering explainability, transparency, and trust in CDSS recommendations \parencite{bayor2025}.
+
+Effective CDSS design balances several tensions:
+
+\textbf{Automation vs. Oversight:} Systems must provide meaningful support without undermining clinical judgment or creating automation bias. Research on CDSS adoption reveals that only 34.2\% of implemented systems achieve sustained uptake, with critical success factors including system utility, workflow fit, ease of use, and appropriate integration into clinical routines \parencite{newton2025a}.
+
+Alert burden and false positives represent a concrete mechanism behind low uptake: Kawamoto and McDonald report that clinicians may ignore a very high fraction of CDS alerts and that excessive false-positive reminders contribute to alert fatigue \parencite{kawamoto2020}.
+
+\textbf{Efficiency vs. Explainability:} While clinicians value speed, they require sufficient explanation to understand and trust recommendations. Lack of interpretability leads directly to mistrust, making easy-to-understand explanations and interactive feedback mechanisms vital for reliability perception \parencite{nasarian2024a}.
+
+\textbf{Generalization vs. Specialization:} Interfaces must accommodate diverse clinical contexts and expertise levels without becoming overly complex. Design recommendations emphasize automatic provision within workflow, alignment with local care processes, ease of access, and succinctness \parencite{kawamoto2020}.
+
+\textbf{Integration with Existing Systems:} Most CDSS remain stand-alone implementations lacking integration with clinical information systems and workflows \parencite{bayor2025}. This "design silo" problem significantly impacts adoption, as systems that feel separate from existing electronic health records create additional workflow burden rather than streamlining clinical processes.
+
+Literature on AI-based CDSS emphasizes the importance of transparency, uncertainty communication, and workflow integration. Systems that simply report predictions without explanation tend to be rejected by clinicians who require justification for clinical decisions \parencite{nasarian2024a}. Human-centered design processes employing multiple methods—including contextual inquiry, group design sessions, and think-aloud usability testing—have proven effective for gathering user requirements and uncovering design issues \parencite{garabedian2022}.
+
+Iterative co-design with end users reveals consistent themes: clinicians value computational utility, workflow optimization, and positive effects on patient care, while emphasizing the need for technical robustness and careful implementation planning \parencite{davidson2025}. Previous evaluations of SIT-CARE prototypes revealed similar patterns, with experienced diagnosticians finding detailed explanations excessive for routine screening, while trainees needed more educational context \parencite{saakyan2023a}. This feedback motivated the multi-mode interface approach pursued in this thesis.
+
+Notably, CDSS adoption dynamics evolve over time. Initially, system-level factors (utility, workflow fit, ease of use) dominate, but individual factors emerge after 6 months, and workarounds develop after 5 years of use \parencite{newton2025a}. This temporal evolution underscores the importance of flexible, adaptive interface designs that can accommodate changing user needs and practices.
+
+\subsection{Human-Computer Interaction for Medical AI}
+\label{subsec:hci-medical-ai}
+
+Human-Computer Interaction research provides principles for designing interpretable AI interfaces. Relevant guidelines include:
+
+\textbf{Explainability:} Users require understanding of how AI systems reach conclusions. For medical applications, this includes not only explanation techniques but also the \emph{explanation user interface} (XUI), which Panigutti et al. emphasize as fundamental for enabling humans to take advantage of and oversee high-risk AI systems \parencite{panigutti2023}. In their co-design work, clinicians prefer actionable text explanations (e.g., risk percentage with timeframe and suggested actions) and request simplified presentations that avoid overwhelming, low-relevance detail \parencite{panigutti2023}.
+
+\textbf{Appropriate Trust:} Interfaces should calibrate user trust to match system capabilities, clearly communicating limitations and uncertainty. Lack of interpretability directly contributes to mistrust, making easy-to-understand explanations and interactive systems with feedback mechanisms vital for reliability perception \parencite{nasarian2024a}. Research demonstrates that explanations enhance clinician-AI communication and that interactive systems supporting collaborative validation improve trust \parencite{bayor2025}.
+
+\textbf{Progressive Disclosure:} Information should be layered, with key insights immediately visible and details available through interaction. Panigutti et al. (2023) recommend a layered view approach with glanceable primary information and detailed secondary information accessible on demand \parencite{panigutti2023}. Clinicians consistently emphasize "less is more" principles, particularly for novice users, with detail-on-demand approaches preferred over information overload \parencite{saakyan2023a}.
+
+\textbf{Consistency:} Interface elements should behave predictably across contexts, reducing cognitive load. Standardized design patterns enable faster learning and should be adopted across CDSS implementations to avoid the "design silo" problem where each system requires learning entirely new interaction paradigms \parencite{bayor2025}.
+
+\textbf{Error Prevention and Recovery:} Design should minimize opportunities for misinterpretation and support error recognition and correction. Clinicians report particular frustration with high alert frequency, screen clutter, and difficulty switching displays—issues that can be mitigated through thoughtful interaction design \parencite{jayawardena2025a}.
+
+\subsection{Interface Design Preferences and Usability Challenges}
+\label{subsec:interface-preferences}
+
+Empirical research on CDSS interfaces reveals consistent patterns in clinician preferences and common usability pitfalls:
+
+\textbf{Visualization Preferences:} Clinicians prefer combined visualizations incorporating both graphs and tables rather than single presentation formats \parencite{jayawardena2025a}. Color-coding systems (particularly traffic light schemes) are the most frequently used and preferred method for indicating risk levels \parencite{jayawardena2025a}. For behavioral data specifically, line plots are preferred over box plots for their interpretability, and gaze heatmaps are considered intuitive when provided with appropriate context \parencite{saakyan2023a}. Bi-dimensional histograms effectively convey gaze distribution patterns \parencite{saakyan2023a}.
+
+\textbf{Common Usability Challenges:} Systematic reviews identify recurring problems including manual data entry requirements, excessive alert frequency, screen clutter, difficulty switching between displays, and inability to customize interfaces to individual workflows \parencite{jayawardena2025a}. These challenges directly impact adoption, as clinicians abandon systems that increase cognitive burden or disrupt established workflows.
+
+\textbf{Actionability Requirements:} Clinicians emphasize that CDSS recommendations must be easy to access and use, save time rather than adding burden, be succinct, and make it easy to implement suggested actions \parencite{kawamoto2020}. Natural language explanations with specific risk percentages and timeframes are strongly preferred over purely numerical or graphical presentations \parencite{panigutti2023}.
+
+\textbf{User Involvement in Design:} While clinician involvement in CDSS design improves workflow fit, barriers persist, and involvement processes are rarely described in depth in published literature \parencite{newton2023}. Human-centered design processes employing contextual inquiry, group design sessions, and iterative think-aloud testing prove effective for uncovering design issues and validating requirements \parencite{garabedian2022}. Co-design with intensive care clinicians revealed five key themes: AI's computational utility, workflow optimization, effects on patient care, technical considerations, and implementation considerations \parencite{davidson2025}.
+
+\textbf{Accessibility Considerations:} Design guidelines for specialized populations, such as children with autism, emphasize consideration of learning styles, cognitive abilities, and specific sensory and interaction needs \parencite{groba2018}. These principles inform accessible design more broadly, ensuring interfaces accommodate diverse user capabilities.
+
+For clinical AI specifically, recent work emphasizes the importance of presenting uncertainty explicitly, providing access to underlying data, and supporting "what-if" exploration that enables clinicians to test hypotheses \parencite{panigutti2023, nasarian2024a}. A theoretical framework for CDSS architecture emphasizes human-data interactions, cognitive functions, and feedback loops for iterative diagnostic discovery \parencite{zikos2018}, highlighting the need for interfaces that support active clinical reasoning rather than passive information consumption.
+
+This thesis builds upon these HCI principles and empirical findings while addressing the specific challenges of multimodal behavioral data presentation and ASC assessment workflows across varying expertise levels and clinical contexts.
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Research Approach}
+\label{subsec:research-approach}
+
+This thesis employs a human-centered design methodology combining qualitative analysis, iterative prototyping, and systematic design documentation. The approach follows established HCI practice for developing clinical decision support tools \parencite{garabedian2022, davidson2025}, emphasizing user needs analysis, design rationale articulation, and implementation validation. Research demonstrates that participation from users throughout the design process leads to better understanding of user requirements and optimal design, even within the constraints of existing EHR alerting systems \parencite{garabedian2022}.
+
+The research process consisted of four primary phases:
+
+\begin{enumerate}
+    \item \textbf{Requirements Elicitation:} Analysis of clinician interviews to derive interface requirements, following contextual inquiry methods proven effective in CDSS development \parencite{garabedian2022}
+    \item \textbf{Use Case Definition:} Characterization of distinct clinical scenarios and corresponding interface needs based on documented differences in clinician experience levels and diagnostic goals \parencite{saakyan2023a}
+    \item \textbf{Design and Prototyping:} Iterative development of interface concepts from low-fidelity sketches to high-fidelity implementations, incorporating feedback loops consistent with CDSS reference models \parencite{zikos2018}
+    \item \textbf{Documentation and Validation:} Systematic linkage of design decisions to requirements and HCI principles \parencite{panigutti2023}
+\end{enumerate}
+
+This methodology prioritizes understanding user needs before proposing solutions, iterative refinement based on emerging insights, and explicit justification of design choices. The approach addresses documented challenges in CDSS adoption by ensuring workflow fit, appropriate involvement of clinicians, and attention to long-term usability considerations \parencite{newton2023, newton2025a}.
+
+\subsection{Qualitative Analysis of Clinician Interviews}
+\label{subsec:qualitative-analysis}
+
+Semi-structured interview logs with clinicians were provided by the SIT-CARE research team. These interviews explored clinician experiences with autism assessment, perceptions of AI assistance, information needs during diagnostic decision-making, and preferences regarding interface design.
+
+Interview participants included both experienced autism diagnosticians and clinicians in training, enabling comparison of needs across expertise levels. The interviews addressed:
+
+\begin{itemize}
+    \item Current diagnostic workflows and pain points
+    \item Information considered essential for diagnostic decisions
+    \item Preferred levels of detail and explanation
+    \item Trust factors and concerns regarding AI recommendations
+    \item Interface preferences and visualization priorities
+\end{itemize}
+
+Thematic analysis of interview transcripts followed standard qualitative research procedures:
+
+\begin{enumerate}
+    \item \textbf{Familiarization:} Multiple readings of transcripts to develop overall understanding
+    \item \textbf{Coding:} Systematic identification of relevant statements and paraphrasing into descriptive codes
+    \item \textbf{Theme Development:} Grouping of related codes into higher-level themes
+    \item \textbf{Review and Refinement:} Iterative refinement of themes for coherence and coverage
+    \item \textbf{Interpretation:} Translation of themes into specific interface requirements
+\end{enumerate}
+
+Key themes emerging from this analysis included the need for flexible detail levels, importance of access to raw behavioral data, desire for educational explanations, and requirements for uncertainty communication. These themes directly informed the three-mode interface architecture.
+
+\subsection{Use Case Definition}
+\label{subsec:use-case-definition}
+
+Based on interview findings and consultation with domain experts, three primary clinical use cases were defined:
+
+\begin{description}
+    \item[\textbf{Screening / Assessment Support:}] Clinicians use the system following patient completion of the SIT to support early-stage screening decisions. This context prioritizes efficiency, with concise presentation of AI recommendations and key behavioral indicators. Typical users are experienced diagnosticians conducting initial evaluations and require rapid overview enabling triage decisions.
+    
+    \item[\textbf{Learning / Educational Exploration:}] Clinicians, particularly trainees, explore the system to understand relationships between behavioral features and ASC diagnosis. This context emphasizes education over efficiency, providing detailed explanations, statistical context (population norms), and visual examples of typical behavioral patterns. The goal is skill development rather than immediate patient decision-making.
+    
+    \item[\textbf{In-Depth Assessment:}] Clinicians investigate complex diagnostic cases, often involving comorbidities (e.g., ADHD, anxiety, depression) where diagnostic uncertainty is high. This context requires maximal detail, with access to granular behavioral data, modality-specific analysis, temporal patterns, and feature-level breakdowns. Users need tools for hypothesis testing and evidence triangulation.
+\end{description}
+
+Each use case corresponds to a distinct interface mode implemented in the SIT-CARE system. The modes share underlying data and visual design language for consistency but differ significantly in information density, explanation depth, and interaction affordances.
+
+\subsection{Design and Prototyping Process}
+\label{subsec:design-prototyping}
+
+Interface design proceeded through multiple iterations:
+
+\textbf{Low-Fidelity Exploration:} Initial concepts were sketched based on requirements and existing SIT-CARE designs. These sketches explored alternative layouts, visualization approaches, and information architectures. Multiple options were considered for key decisions such as modality presentation, AI recommendation display, and uncertainty communication.
+
+\textbf{Mid-Fidelity Mockups:} Selected concepts were refined into digital mockups using Figma design software. These mockups specified visual hierarchy, color schemes, typography, iconography, and interaction patterns. Design reviews with research team members provided feedback informing revisions.
+
+\textbf{High-Fidelity Prototype:} A high-fidelity prototype implementation was developed to validate key interaction patterns and visualization concepts in code (detailed in Section \ref{subsec:implementation-tech}).
+
+Throughout the design process, established HCI principles guided decisions:
+\begin{itemize}
+    \item \textbf{Visual hierarchy} to emphasize important information
+    \item \textbf{Progressive disclosure} to manage complexity
+    \item \textbf{Consistency} in terminology, visual elements, and interaction patterns
+    \item \textbf{Feedback} to confirm user actions and system state
+    \item \textbf{Accessibility} through appropriate color contrast and text sizing
+\end{itemize}
+
+\subsection{Implementation Technologies}
+\label{subsec:implementation-tech}
+
+The SIT-CARE interface is implemented as a single-page web application prototype to maximize accessibility and eliminate installation barriers. Key technologies include:
+
+\textbf{React:} JavaScript library for building user interfaces with component-based architecture. React's declarative approach and efficient rendering made it well-suited for the interactive visualizations required.
+
+\textbf{TypeScript:} Typed superset of JavaScript providing static type checking. TypeScript improved code reliability and maintainability, particularly important for complex data structures representing multimodal behavioral features.
+
+\textbf{Vite:} Next-generation build tool offering fast development server and optimized production builds.
+
+\textbf{Radix UI:} Low-level UI component library providing accessible, unstyled primitives for building custom interfaces. Radix components handle complex interactions (dialogs, dropdowns, tooltips) with proper keyboard navigation and screen reader support.
+
+\textbf{Tailwind CSS:} Utility-first CSS framework enabling rapid styling with consistent design tokens. Tailwind's approach reduced CSS complexity while maintaining visual consistency.
+
+\textbf{Recharts:} Composable charting library built on React and D3. Recharts provided the foundation for behavioral data visualizations including line charts, radar charts, and custom overlays.
+
+\textbf{i18next:} Internationalization framework supporting English and German language options. All user-facing text is stored in translation files, enabling easy language switching and future language additions.
+
+\textbf{Lucide React:} Icon library providing consistent, scalable icon set for navigation and feature representation.
+
+This technology stack was selected to balance developer productivity, performance, maintainability, and alignment with modern web development best practices.
+
+\subsection{System Architecture Overview}
+\label{subsec:system-arch-overview}
+
+The SIT-CARE system comprises several components operating in sequence (illustrated in \autoref{fig:system-sequence}), following a CDSS reference model that emphasizes human-data interactions, cognitive functions, and feedback loops for iterative discovery \parencite{zikos2018}. This thesis focuses on the clinician-facing interface while describing the surrounding components to provide end-to-end context:
+
+\begin{enumerate}
+    \item \textbf{Video and Multimodal Capture (VMC):} Patient completes SIT interaction while being recorded. The system captures video, audio, and optional eye-tracking data using the standardized 7-minute simulated dialog protocol \parencite{drimalla2020b}.
+    
+    \item \textbf{Feature Extraction:} Automated processing pipeline (Luigi-orchestrated) extracts behavioral features from recordings: gaze patterns, facial action units, vocal prosody, head movements, and mimicry measures using validated techniques \parencite{saakyan2025a}.
+    
+    \item \textbf{ML Classification:} Trained models process extracted features to generate ASC likelihood scores and feature importance weightings. The multimodal fusion approach combines five modalities to achieve optimal diagnostic accuracy \parencite{saakyan2025a}.
+    
+    \item \textbf{Result Storage:} Processed results are transmitted to the frontend application via authenticated API and stored temporarily with associated metadata.
+    
+    \item \textbf{Secure Access:} Time-limited access tokens (JWT) encode patient identifier and expiration to enable controlled clinician access.
+    
+    \item \textbf{Clinician Notification:} Secure links support low-friction access within workflow, aligned with CDSS adoption recommendations \parencite{kawamoto2020}.
+    
+    \item \textbf{Result Access:} Clinicians access results and use the interface modes described in this thesis.
+    
+    \item \textbf{Automatic Expiration:} Results become inaccessible after a defined time window to reduce privacy risk.
+\end{enumerate}
+
+This architecture emphasizes privacy and security while maintaining usability, addressing the documented challenge that most CDSS remain stand-alone systems lacking integration with clinical workflows \parencite{bayor2025}. The thesis implementation focuses specifically on the clinician-facing interface.
+
+\section{Requirements Analysis}
+\label{sec:requirements}
+
+This section presents the interface requirements derived from systematic analysis of clinician interviews and grounded in established HCI principles for medical decision support systems.
+
+\subsection{Clinician Interview Themes}
+\label{subsec:interview-themes}
+
+Thematic analysis of semi-structured clinician interviews revealed several key themes regarding information needs, workflow preferences, and trust factors:
+
+\textbf{Need for Flexible Detail Levels:} Experienced diagnosticians emphasized efficiency, preferring concise overviews that enable rapid triage decisions. One senior clinician stated: "I don't need to see every detail during screening—just show me the essentials and let me drill down if needed." Conversely, trainees and less experienced clinicians valued detailed explanations and educational context to support learning.
+
+\textbf{Access to Raw Behavioral Data:} Clinicians across experience levels stressed the importance of examining underlying evidence rather than relying solely on model predictions. The ability to review gaze heatmaps, facial expression timelines, and vocal prosody visualizations was considered essential for building trust and forming independent clinical judgments.
+
+\textbf{Uncertainty Communication:} Participants highlighted that AI recommendations must include explicit uncertainty quantification. Overly confident presentations risk automation bias, while appropriately calibrated confidence enables clinicians to weight recommendations in context of other clinical information.
+
+\textbf{Educational Support:} Less experienced clinicians requested comparative visualizations showing typical patterns in ASC versus non-ASC populations, along with explanations of why specific features are diagnostically relevant.
+
+\textbf{Workflow Integration:} The system must accommodate different assessment contexts—from rapid screening to detailed differential diagnosis. Interface modes should match clinical goals without requiring extensive configuration.
+
+\subsection{Functional Requirements by Use Case}
+\label{subsec:functional-requirements}
+
+Based on interview themes and use case definitions, specific functional requirements were derived:
+
+\subsubsection{Screening Mode Requirements}
+
+\begin{enumerate}
+    \item \textbf{FR-S1:} Display overall AI assessment (ASC likelihood) prominently with confidence level
+    \item \textbf{FR-S2:} Show high-level summary of key behavioral indicators across modalities
+    \item \textbf{FR-S3:} Provide visual indicators (icons, colors) for rapid interpretation
+    \item \textbf{FR-S4:} Enable one-click access to more detailed analysis
+    \item \textbf{FR-S5:} Minimize cognitive load through progressive disclosure
+    \item \textbf{FR-S6:} Display assessment completion status and data quality indicators
+\end{enumerate}
+
+\subsubsection{Learning Mode Requirements}
+
+\begin{enumerate}
+    \item \textbf{FR-L1:} Present comparative statistics (patient vs. ASC norm vs. control norm)
+    \item \textbf{FR-L2:} Provide educational explanations for each behavioral feature
+    \item \textbf{FR-L3:} Include visual examples of typical patterns (e.g., gaze heatmaps from reference populations)
+    \item \textbf{FR-L4:} Explain diagnostic significance of each modality
+    \item \textbf{FR-L5:} Support exploration without time pressure
+    \item \textbf{FR-L6:} Link behavioral features to underlying neural mechanisms when relevant
+\end{enumerate}
+
+\subsubsection{Assessment Mode Requirements}
+
+\begin{enumerate}
+    \item \textbf{FR-A1:} Display detailed feature-level data for all modalities
+    \item \textbf{FR-A2:} Show temporal patterns and variability metrics
+    \item \textbf{FR-A3:} Provide modality-specific visualizations (gaze heatmaps, facial expression timelines, prosody spectrograms, head movement tracking, mimicry correlations)
+    \item \textbf{FR-A4:} Enable comparison across modalities to identify convergent evidence
+    \item \textbf{FR-A5:} Display feature importance weights from ML model
+    \item \textbf{FR-A6:} Support hypothesis testing through interactive data filtering
+    \item \textbf{FR-A7:} Export detailed report for clinical documentation
+\end{enumerate}
+
+\subsection{Non-Functional Requirements}
+\label{subsec:nonfunctional-requirements}
+
+\begin{enumerate}
+    \item \textbf{NFR-1 (Usability):} Interface should be learnable within 15 minutes for basic operation
+    \item \textbf{NFR-2 (Performance):} Page load time should not exceed 2 seconds on standard clinical workstations
+    \item \textbf{NFR-3 (Accessibility):} Interface must meet WCAG 2.1 Level AA standards
+    \item \textbf{NFR-4 (Security):} All data transmission must use TLS encryption; authentication via time-limited JWT tokens
+    \item \textbf{NFR-5 (Privacy):} Assessment results automatically expire after 24 hours
+    \item \textbf{NFR-6 (Internationalization):} Support for English and German languages with extensible architecture
+    \item \textbf{NFR-7 (Compatibility):} Function correctly on modern browsers (Chrome, Firefox, Safari, Edge)
+    \item \textbf{NFR-8 (Maintainability):} Codebase should follow TypeScript best practices with comprehensive type definitions
+\end{enumerate}
+
+\subsection{Design Principles}
+\label{subsec:design-principles}
+
+The following HCI and medical informatics principles guided interface design decisions:
+
+\textbf{Transparency:} All AI recommendations include explanatory information about contributing factors and confidence levels.
+
+\textbf{Appropriate Trust Calibration:} The system communicates both capabilities and limitations to prevent over-reliance or dismissal.
+
+\textbf{Progressive Disclosure:} Information is layered from overview to detail, matching cognitive load to task requirements.
+
+\textbf{Consistency:} Visual design language, terminology, and interaction patterns remain consistent across modes.
+
+\textbf{Feedback:} System provides clear indication of state changes and action results.
+
+\textbf{Error Prevention:} Design minimizes opportunities for misinterpretation through clear labeling and visual hierarchy.
+
+\textbf{User Control:} Clinicians can navigate freely between modes and detail levels without system constraints.
+
+\section{System Design and Architecture}
+\label{sec:system-design}
+
+This section describes the overall system architecture, component structure, and data flow from video capture through clinician interface access.
+
+\subsection{End-to-End System Architecture}
+\label{subsec:e2e-architecture}
+
+The complete SIT-CARE system comprises several stages operating in sequence:
+
+\begin{enumerate}
+    \item \textbf{Data Capture:} Patient completes Simulated Interaction Task in controlled environment with video, audio, and optional eye-tracking equipment
+    
+    \item \textbf{Feature Extraction:} Automated processing pipeline extracts multimodal behavioral features:
+    \begin{itemize}
+        \item Gaze patterns (fixation locations, horizontal/vertical angle variance, time on screen vs. partner)
+        \item Facial expressions (smile intensity, eyebrow movements, general facial action units tracked over time)
+        \item Vocal prosody (pitch variance, speech rate, loudness patterns)
+        \item Head movements (nodding patterns, horizontal movement, coordination)
+        \item Mimicry (cross-correlation with interaction partner, dynamic time warping distance)
+    \end{itemize}
+    
+    \item \textbf{ML Classification:} Trained models process feature vectors to generate:
+    \begin{itemize}
+        \item Overall ASC likelihood score (0-100\%)
+        \item Confidence/uncertainty estimate
+        \item Feature importance weights
+        \item Modality-specific sub-scores
+    \end{itemize}
+    
+    \item \textbf{Result Delivery:} Backend system securely transmits results to frontend application
+    
+    \item \textbf{Secure Access:} JWT-based authentication enables time-limited clinician access
+    
+    \item \textbf{Clinician Interface:} Web-based frontend presents results through three interaction modes (focus of this thesis)
+\end{enumerate}
+
+\subsection{Authentication and Privacy Architecture}
+\label{subsec:auth-architecture}
+
+Patient privacy and data security are paramount concerns. The system implements a token-based access control mechanism:
+
+\textbf{JWT Token Generation:} Upon completion of feature extraction and ML analysis, the backend generates a JSON Web Token containing:
+\begin{itemize}
+    \item Patient identifier (pseudonymized)
+    \item Assessment timestamp
+    \item Token expiration (24 hours from generation)
+    \item Digital signature for tampering prevention
+\end{itemize}
+
+\textbf{Secure Link Distribution:} The JWT is embedded in a unique URL and transmitted to the designated clinician via secure email.
+
+\textbf{Access Validation:} When the clinician clicks the link:
+\begin{enumerate}
+    \item Frontend extracts JWT from URL parameter
+    \item Token signature is cryptographically verified
+    \item Expiration timestamp is checked
+    \item If valid, assessment results are retrieved and displayed
+    \item If expired or invalid, access is denied with appropriate error message
+\end{enumerate}
+
+\textbf{Automatic Expiration:} Results become inaccessible exactly 24 hours after token generation, regardless of whether they were viewed. This ensures compliance with data retention policies and minimizes privacy risk.
+
+\textbf{No Persistent Storage:} The frontend application does not store assessment results locally. Data persists only in browser memory during the session and is cleared on navigation away or window closure.
+
+This architecture balances usability (single-click access via email link) with security (time-limited, tamper-proof tokens; no persistent storage).
+
+\subsection{Frontend Component Architecture}
+\label{subsec:frontend-architecture}
+
+The web application follows a component-based architecture using React:
+
+\textbf{Application Shell:}
+\begin{itemize}
+    \item Navigation component with mode selection
+    \item Language switcher (English/German)
+    \item Patient identifier display
+    \item Assessment metadata (completion date, data quality indicators)
+\end{itemize}
+
+\textbf{Mode-Specific Views:}
+\begin{itemize}
+    \item ScreeningView: Concise overview with key findings
+    \item LearningView: Educational interface with comparative statistics
+    \item AssessmentView: Detailed analysis with full data access
+\end{itemize}
+
+\textbf{Shared Components:}
+\begin{itemize}
+    \item ModalityCard: Displays data for individual modalities (gaze, facial, vocal, head, mimicry)
+    \item FeatureVisualization: Charts and graphs for behavioral measures
+    \item ResultsCard: AI assessment summary with confidence visualization
+    \item ComparisonTable: Patient values alongside population norms
+    \item ExplanationDialog: Contextual help and educational content
+\end{itemize}
+
+\textbf{Data Layer:}
+\begin{itemize}
+    \item modalityData.ts: Type definitions and example data structures
+    \item i18n configuration: Translation files for internationalization
+    \item Mock data: Representative assessment results for development and demonstration
+\end{itemize}
+
+\subsection{Data Flow Sequence}
+\label{subsec:data-flow}
+
+The complete data flow, incorporating the sequence diagram information, proceeds as follows:
+
+\begin{enumerate}
+    \item \textbf{VMC (Video and Multimodal Capture):} Luigi workflow orchestrator triggers SIT data processing
+    
+    \item \textbf{Feature Processing:} VMC component processes video and extracts multimodal features using computer vision and audio analysis pipelines
+    
+    \item \textbf{Result Transmission:} VMC POSTs processed results to Frontend via internal authentication
+    
+    \item \textbf{Temporary Storage:} Frontend stores results temporarily (database or cache)
+    
+    \item \textbf{Token Generation:} Frontend generates JWT token with 24-hour expiration
+    
+    \item \textbf{Email Notification:} System sends email to clinician containing secure link with embedded JWT
+    
+    \item \textbf{Clinician Access:} Clinician clicks link, frontend validates JWT token
+    
+    \item \textbf{Display Results:} If token valid and unexpired, frontend renders results dashboard through one of three interface modes
+    
+    \item \textbf{Auto-Delete:} Results automatically become inaccessible after expiry period
+\end{enumerate}
+
+This architecture ensures patient data security while maintaining clinical workflow usability.
+
+\section{Interface Design}
+\label{sec:interface-design}
+
+This section provides detailed documentation of the three interface modes, explaining visualization choices, interaction patterns, and design rationales with explicit reference to requirements and HCI principles.
+
+\subsection{Design Overview and Mode Selection}
+\label{subsec:design-overview}
+
+The SIT-CARE interface implements three distinct modes accessible through a persistent navigation component. Each mode shares a consistent visual design language while adapting information density and interaction affordances to specific clinical goals.
+
+\textbf{Mode Selection Interface:} Users select modes via a horizontal tab-like navigation with clear icons and labels:
+\begin{itemize}
+    \item \textbf{Screening Mode} (Stethoscope icon): "Quick Assessment Support"
+    \item \textbf{Learning Mode} (Graduation Cap icon): "Educational Exploration"
+    \item \textbf{Assessment Mode} (Brain icon): "Detailed Analysis"
+\end{itemize}
+
+This top-level navigation remains visible at all times, allowing seamless transitions between modes without losing context. The active mode is visually distinguished through color highlighting and typography (bold weight).
+
+\subsection{Screening Mode Design}
+\label{subsec:screening-mode}
+
+Screening Mode addresses \textbf{FR-S1} through \textbf{FR-S6}, prioritizing efficiency for experienced clinicians conducting initial evaluations.
+
+\subsubsection{Layout and Visual Hierarchy}
+
+The screening interface employs a three-region layout:
+
+\textbf{Header Region:} Displays patient pseudonym, assessment date, and overall data quality indicator. This meta-information anchors the clinician's orientation.
+
+\textbf{Primary Results Card:} Occupies prominent position (top-center), presenting:
+\begin{itemize}
+    \item Overall ASC likelihood score as percentage with large typography
+    \item Visual gauge (progress bar or dial) for at-a-glance interpretation
+    \item Confidence level (High/Medium/Low) with explanatory icon
+    \item Brief textual interpretation (e.g., "Elevated markers consistent with ASC")
+\end{itemize}
+
+This design satisfies \textbf{FR-S1} by making the primary recommendation immediately visible without scrolling.
+
+\textbf{Modality Summary Grid:} Below the primary card, a grid layout presents high-level indicators for each behavioral modality:
+\begin{itemize}
+    \item \textbf{Icon representation:} Eye (gaze), Smile (facial), Microphone (vocal), Head arrow (head movement), Theater masks (mimicry)
+    \item \textbf{Status indicator:} Color-coded badges (green=typical, yellow=borderline, red=atypical) based on deviation from normative ranges, following the traffic light risk schema preferred by clinicians \parencite{jayawardena2025a}
+    \item \textbf{Summary statistic:} One key measure per modality (e.g., "Gaze fixation: 21\%")
+\end{itemize}
+
+This grid enables rapid scanning of behavioral patterns across modalities (\textbf{FR-S2}, \textbf{FR-S3}), leveraging preattentive visual processing through color and spatial arrangement.
+
+\subsubsection{Progressive Disclosure}
+
+Each modality card in the summary grid includes a "Details" button, enabling drill-down to more comprehensive information (\textbf{FR-S4}). Clicking reveals an expanded view with:
+\begin{itemize}
+    \item Multiple behavioral features for that modality
+    \item Simplified visualizations (small line charts or bar graphs), following clinician preferences for combined graph and table presentations \parencite{jayawardena2025a}
+    \item Comparison to normative ranges (patient value highlighted)
+\end{itemize}
+
+This progressive disclosure pattern satisfies \textbf{FR-S5} by keeping the initial view uncluttered while maintaining access to supporting evidence for clinicians who wish to investigate further, implementing the "less is more" principle emphasized by clinicians \parencite{saakyan2023a, panigutti2023}.
+
+\subsubsection{Design Rationale}
+
+The screening mode design emphasizes Gestalt principles of perception:
+\begin{itemize}
+    \item \textbf{Proximity:} Related information is spatially grouped
+    \item \textbf{Similarity:} Repeated visual patterns (icon + badge + metric) create predictable scanning paths
+    \item \textbf{Hierarchy:} Size, color saturation, and position communicate importance
+\end{itemize}
+
+The use of color-coded badges balances rapid interpretation with the need for nuance—green does not mean "definitely normal" but rather "within typical range," avoiding oversimplification that could mislead clinical judgment.
+
+\subsection{Learning Mode Design}
+\label{subsec:learning-mode}
+
+Learning Mode addresses \textbf{FR-L1} through \textbf{FR-L6}, prioritizing education over efficiency. This mode serves trainees and clinicians seeking to deepen understanding of behavioral markers.
+
+\subsubsection{Comparative Visualization Approach}
+
+The core design element is comparative data presentation. For each behavioral feature, the interface displays:
+
+\textbf{Three-Column Comparison Table:}
+\begin{itemize}
+    \item Column 1: Current patient's value
+    \item Column 2: ASC population mean \textpm standard deviation
+    \item Column 3: Control (non-ASC) population mean \textpm standard deviation
+\end{itemize}
+
+Visual encoding uses:
+\begin{itemize}
+    \item \textbf{Bar charts:} Show patient value relative to population distributions
+    \item \textbf{Color coding:} Patient bar in blue, ASC norm in red, control norm in green
+    \item \textbf{Overlay markers:} Indicate standard deviation ranges as shaded regions
+\end{itemize}
+
+This satisfies \textbf{FR-L1} by making patterns immediately apparent—for example, a patient whose gaze fixation falls within the ASC range but outside the control range provides educational insight into typical ASC presentations.
+
+\subsubsection{Educational Annotations}
+
+Each modality section includes:
+
+\textbf{Explanatory Text:} Brief description of what the modality measures and why it is diagnostically relevant. For example, the gaze modality explanation notes: "Individuals with ASC often show reduced eye contact and greater gaze variance during social interaction. These patterns relate to differences in social attention and processing."
+
+\textbf{Visual Examples:} Reference images or videos showing typical patterns. For instance, the facial expressivity section includes side-by-side example images labeled "Typical ASC pattern" and "Typical control pattern," illustrating differences in smile intensity and facial action unit activation.
+
+\textbf{Interpretation Guidance:} Notes on clinical significance, such as: "Reduced pitch variance may indicate flattened prosody, a common autistic trait. However, this feature alone is not diagnostic and must be considered alongside other modalities."
+
+These elements address \textbf{FR-L2}, \textbf{FR-L4}, and \textbf{FR-L6}, transforming the interface into an educational resource rather than merely a reporting tool.
+
+\subsubsection{Exploratory Interaction}
+
+Learning mode employs an accordion-style layout where each modality can be expanded or collapsed independently. This allows users to:
+\begin{itemize}
+    \item Focus on one modality at a time for deep exploration
+    \item Compare across modalities by expanding multiple sections
+    \item Proceed at their own pace without time pressure (\textbf{FR-L5})
+\end{itemize}
+
+Interactive tooltips provide additional context on hover, such as definitions of technical terms ("cross-correlation," "dynamic time warping") without cluttering the main interface.
+
+\subsubsection{Design Rationale}
+
+Learning mode draws on principles of constructivist education and multimedia learning theory:
+\begin{itemize}
+    \item \textbf{Worked Examples:} Showing typical patterns helps learners build mental models
+    \item \textbf{Comparative Processing:} Juxtaposing patient data with norms highlights relevant contrasts
+    \item \textbf{Segmentation:} Breaking content into modality-specific chunks prevents cognitive overload
+    \item \textbf{Multimodal Presentation:} Combining text, images, and data visualizations accommodates diverse learning preferences
+\end{itemize}
+
+The design assumes learners are intrinsically motivated and willing to invest time, contrasting with screening mode's efficiency focus.
+
+\subsection{Assessment Mode Design}
+\label{subsec:assessment-mode}
+
+Assessment Mode addresses \textbf{FR-A1} through \textbf{FR-A7}, providing comprehensive data access for complex diagnostic cases.
+
+\subsubsection{Detailed Modality Visualizations}
+
+Each modality receives a dedicated subsection with maximum information density:
+
+\textbf{Gaze Modality:}
+\begin{itemize}
+    \item Heatmap visualization showing fixation distribution across interaction partner's face
+    \item Timeline chart of horizontal and vertical gaze angles over interaction duration
+    \item Statistics table with multiple metrics (fixation percentage, saccade frequency, pupil dilation)
+\end{itemize}
+
+\textbf{Facial Expressivity:}
+\begin{itemize}
+    \item Time-series plot of major facial action units (AU6 cheek raiser, AU12 lip corner puller, AU4 brow lowerer)
+    \item Intensity heatmap showing which expressions occurred when
+    \item Summary statistics (mean, variance, peak intensity) for each action unit
+\end{itemize}
+
+\textbf{Vocal Prosody:}
+\begin{itemize}
+    \item Pitch contour visualization over time
+    \item Speech rate variation graph
+    \item Loudness dynamics
+    \item Spectral analysis (formant frequencies for interested specialists)
+\end{itemize}
+
+\textbf{Head Movement:}
+\begin{itemize}
+    \item 3D head pose tracking visualization
+    \item Nodding frequency and amplitude
+    \item Horizontal and vertical movement patterns
+    \item Coordination metrics with speech segments
+\end{itemize}
+
+\textbf{Mimicry:}
+\begin{itemize}
+    \item Cross-correlation plot showing patient expression alignment with interaction partner
+    \item Dynamic time warping visualization illustrating temporal correspondence
+    \item Lag analysis (timing delays in mimicry responses)
+\end{itemize}
+
+These detailed visualizations satisfy \textbf{FR-A2} and \textbf{FR-A3}, enabling deep forensic examination of behavioral patterns.
+
+\subsubsection{Multi-Modal Integration View}
+
+A distinctive feature of assessment mode is the integrated overview that displays all modalities simultaneously using a radar chart (spider plot). Each modality occupies one axis, with values normalized to standard deviation units from control population mean. Patient data plots as a colored polygon overlaid on ASC population average polygon.
+
+This view satisfies \textbf{FR-A4} by enabling visual identification of convergent evidence—if the patient polygon consistently falls within ASC ranges across multiple modalities, diagnostic confidence increases.
+
+\subsubsection{Feature Importance Display}
+
+Assessment mode includes a dedicated section showing ML model feature importance weights, addressing \textbf{FR-A5}:
+
+\begin{itemize}
+    \item Horizontal bar chart ranking features by contribution to model prediction
+    \item Color coding by modality for quick pattern recognition
+    \item Interactive filtering to show only highly weighted features
+\end{itemize}
+
+This transparency allows clinicians to understand which behavioral patterns most influenced the AI recommendation, supporting critical evaluation of model rationale.
+
+\subsubsection{Interactive Exploration Tools}
+
+Advanced interaction affordances include:
+
+\textbf{Temporal Filtering:} Scrubbing timeline to examine specific interaction segments (e.g., "Show facial expressions only during participant responses")
+
+\textbf{Threshold Adjustment:} Modifying display thresholds to highlight only strongly atypical features
+
+\textbf{Modality Comparison:} Side-by-side display of two modalities to investigate co-occurrence (e.g., "Does reduced gaze fixation coincide with flattened prosody?")
+
+These tools address \textbf{FR-A6} by supporting hypothesis-driven investigation beyond simple data review.
+
+\subsubsection{Export and Documentation}
+
+Assessment mode includes a "Generate Report" function (\textbf{FR-A7}) that produces a PDF summary containing:
+\begin{itemize}
+    \item Selected visualizations
+    \item Quantitative feature table
+    \item AI recommendation with confidence level
+    \item Timestamp and clinician identifier for medical record documentation
+\end{itemize}
+
+\subsubsection{Design Rationale}
+
+Assessment mode assumes expert users comfortable with technical visualization and willing to invest substantial time. The design prioritizes:
+
+\begin{itemize}
+    \item \textbf{Information Maximization:} More data is better; users can filter as needed
+    \item \textbf{Flexibility:} Multiple views accommodate different investigation strategies
+    \item \textbf{Transparency:} All underlying data and model logic accessible
+    \item \textbf{Trust Through Verification:} Users can independently assess model plausibility
+\end{itemize}
+
+The interface resembles professional data analysis tools (e.g., statistical software, medical imaging viewers) more than consumer applications, reflecting the specialist audience's sophistication and task complexity.
+
+\subsection{Cross-Mode Consistency}
+\label{subsec:cross-mode-consistency}
+
+Despite differing information densities, all three modes maintain consistency in:
+
+\textbf{Visual Design Language:}
+\begin{itemize}
+    \item Color palette (blue primary, red for ASC indicators, green for typical ranges)
+    \item Typography hierarchy (Headings, body text, data labels)
+    \item Icon set (Lucide React library throughout)
+    \item Spacing and layout grid
+\end{itemize}
+
+\textbf{Terminology:} Behavioral features use identical labels across modes (e.g., "Horizontal gaze angle variance" never abbreviated differently)
+
+\textbf{Navigation Patterns:} Mode switching, language selection, and help access function identically
+
+This consistency satisfies the HCI principle of \textbf{Learnability}—knowledge transfers across modes, reducing cognitive burden when switching contexts.
+
+\section{Implementation}
+\label{sec:implementation}
+
+This section describes the technical realization of the designed interfaces, including technology choices, component architecture, internationalization strategy, and deployment considerations.
+
+\subsection{Technology Stack}
+\label{subsec:tech-stack}
+
+The implementation utilizes modern web technologies selected for development efficiency, performance, and maintainability:
+
+\textbf{React 18:} Component-based JavaScript library enabling declarative UI construction and efficient re-rendering through virtual DOM diffing. React's hooks API (useState, useEffect, useMemo) simplifies state management and side effect handling.
+
+\textbf{TypeScript 5:} Adds static typing to JavaScript, catching errors at compile time rather than runtime. Type definitions for all components, props, and data structures improve code reliability and developer experience through IDE autocomplete and inline documentation.
+
+\textbf{Vite 5:} Build tool providing fast hot module replacement (HMR) during development and optimized production bundles. Vite's ES module-based architecture significantly reduces development server startup time compared to traditional bundlers.
+
+\textbf{Tailwind CSS 3:} Utility-first CSS framework enabling rapid styling without writing custom CSS files. Tailwind's design token system (colors, spacing, typography) ensures visual consistency. The framework's tree-shaking removes unused styles in production builds.
+
+\textbf{Radix UI:} Unstyled, accessible UI primitives providing complex interaction patterns (dialogs, dropdowns, tabs, tooltips) with proper ARIA attributes and keyboard navigation. Radix handles accessibility concerns automatically, allowing developers to focus on visual design.
+
+\textbf{Recharts:} Declarative charting library built on React and D3. Recharts provides line charts, bar charts, radar charts, and custom visualizations required for behavioral data display. The library's responsive design adapts charts to container dimensions.
+
+\textbf{i18next:} Internationalization framework managing translations for English and German. The library supports dynamic language switching, pluralization rules, and interpolation (inserting variables into translated strings).
+
+\textbf{Lucide React:} Icon library providing consistent, scalable SVG icons. Icons are imported as React components, enabling easy styling and animation.
+
+\subsection{Component Architecture}
+\label{subsec:component-arch}
+
+The application follows a hierarchical component structure:
+
+\textbf{App.tsx} (Root Component):
+\begin{itemize}
+    \item Manages global state (current mode, language preference)
+    \item Handles JWT validation and data loading
+    \item Renders navigation shell and mode-specific views
+    \item Provides context (data, user preferences) to child components
+\end{itemize}
+
+\textbf{Navigation Components:}
+\begin{itemize}
+    \item ModeSelector: Three-button group for mode switching
+    \item LanguageSwitcher: Dropdown menu for English/German selection
+    \item Header: Patient identifier, assessment date, data quality indicators
+\end{itemize}
+
+\textbf{View Components:}
+\begin{itemize}
+    \item ScreeningView: Implements screening mode layout and logic
+    \item LearningView: Implements learning mode with comparison tables
+    \item AssessmentView: Implements detailed analysis mode
+\end{itemize}
+
+\textbf{Shared Components:}
+\begin{itemize}
+    \item ModalityCard: Reusable container for modality-specific data display
+    \item ResultsCard: AI recommendation presentation with confidence gauge
+    \item FeatureTable: Displays feature values with optional comparison columns
+    \item StatisticsGrid: Responsive grid layout for metrics
+    \item VisualizationContainer: Wrapper for Recharts components with responsive behavior
+    \item ExplanationDialog: Modal dialog for educational content
+\end{itemize}
+
+\textbf{UI Primitives (from Radix/shadcn):}
+\begin{itemize}
+    \item Button, Card, Badge, Alert, Tabs, Accordion, Tooltip, Dialog, DropdownMenu
+\end{itemize}
+
+Components follow the \textbf{composition pattern}, where complex interfaces are built by combining simpler components rather than creating monolithic implementations. This approach enhances reusability and testability.
+
+\subsection{State Management}
+\label{subsec:state-management}
+
+The application employs React's built-in state management rather than external libraries (Redux, MobX):
+
+\textbf{Local State:} Components manage their own state for UI concerns (accordion open/closed, active tab, tooltip visibility) using useState hooks.
+
+\textbf{Lifted State:} Shared state (current mode, assessment data) is lifted to the App component and passed down via props.
+
+\textbf{Context API:} Translation functions and language state are provided via React Context, allowing any component to access internationalization without prop drilling.
+
+This approach is appropriate for the application's complexity level—avoiding over-engineering while maintaining clear data flow.
+
+\subsection{Data Modeling}
+\label{subsec:data-modeling}
+
+TypeScript interfaces define the structure of assessment data:
+
+\begin{verbatim}
+interface AssessmentData {
+  patientId: string;
+  assessmentDate: Date;
+  dataQuality: 'high' | 'medium' | 'low';
+  overallScore: number; // 0-100
+  confidence: 'high' | 'medium' | 'low';
+  modalities: {
+    gaze: GazeData;
+    facial: FacialData;
+    vocal: VocalData;
+    head: HeadData;
+    mimicry: MimicryData;
+  };
+  featureImportance: FeatureWeight[];
+}
+
+interface GazeData {
+  fixationPercentage: number;
+  horizontalVariance: number;
+  verticalVariance: number;
+  heatmap: number[][]; // 2D array for visualization
+  timeline: TimeSeriesPoint[];
+}
+
+// Similar interfaces for other modalities...
+\end{verbatim}
+
+These types ensure that components receive correctly structured data and prevent runtime errors from malformed API responses.
+
+\subsection{Internationalization Implementation}
+\label{subsec:i18n-implementation}
+
+Translation files are organized in JSON format:
+
+\textbf{en.ts (English):}
+\begin{verbatim}
+export const en = {
+  translation: {
+    modes: {
+      screening: "Screening",
+      learning: "Learning",
+      assessment: "Assessment",
+    },
+    modalities: {
+      gaze: "Gaze Behavior",
+      facial: "Facial Expressivity",
+      vocal: "Vocal Prosody",
+      // ...
+    },
+    results: {
+      overallAssessment: "Overall Assessment",
+      confidence: "Confidence",
+      // ...
+    },
+    // ... hundreds of translation keys
+  }
+};
+\end{verbatim}
+
+\textbf{de.ts (German):}
+\begin{verbatim}
+export const de = {
+  translation: {
+    modes: {
+      screening: "Screening",
+      learning: "Lernen",
+      assessment: "Detailanalyse",
+    },
+    modalities: {
+      gaze: "Blickverhalten",
+      facial: "Gesichtsausdruck",
+      vocal: "Stimmprosodie",
+      // ...
+    },
+    // ...
+  }
+};
+\end{verbatim}
+
+Components access translations using the useTranslation hook:
+
+\begin{verbatim}
+const { t } = useTranslation();
+return <h2>{t('modalities.gaze')}</h2>;
+\end{verbatim}
+
+This architecture supports future language additions (French, Spanish, etc.) by simply adding new translation files without code changes.
+
+\subsection{Responsive Design}
+\label{subsec:responsive-design}
+
+The interface adapts to different screen sizes using:
+
+\textbf{Tailwind Responsive Utilities:} Breakpoint prefixes (sm:, md:, lg:, xl:) apply styles conditionally based on viewport width. For example:
+\begin{verbatim}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+\end{verbatim}
+creates a single-column layout on mobile, two columns on tablets, three on desktops.
+
+\textbf{ResponsiveContainer (Recharts):} Charts automatically resize to fit their container, maintaining aspect ratios and readability.
+
+\textbf{Mobile Navigation:} On narrow screens, the mode selector collapses into a dropdown menu rather than horizontal buttons.
+
+While the primary target is desktop workstations (typical clinical environment), responsive design ensures usability on tablets for situations like bedside consultations or remote access.
+
+\subsection{Accessibility Considerations}
+\label{subsec:accessibility}
+
+Accessibility features include:
+
+\textbf{Semantic HTML:} Proper use of heading hierarchy (h1, h2, h3), landmark elements (nav, main, aside), and button elements for interactive controls.
+
+\textbf{ARIA Attributes:} Radix UI components include appropriate aria-label, aria-expanded, aria-hidden attributes for screen reader support.
+
+\textbf{Keyboard Navigation:} All interactive elements are keyboard-accessible. Tab order follows logical reading sequence. Escape key closes modals and dropdowns.
+
+\textbf{Color Contrast:} Text-background combinations meet WCAG AA standards (minimum 4.5:1 ratio for body text, 3:1 for large text).
+
+\textbf{Focus Indicators:} Visible outline appears around focused elements for keyboard navigation visibility.
+
+\textbf{Alt Text:} Images include descriptive alt attributes (e.g., "Gaze heatmap showing concentration of fixations on upper face region").
+
+These accessibility considerations ensure the system is usable by clinicians with visual impairments or motor limitations requiring keyboard-only interaction.
+
+\subsection{Development Workflow}
+\label{subsec:dev-workflow}
+
+The development process utilized:
+
+\textbf{Version Control:} Git repository with feature branches for major additions, merged via pull requests after review.
+
+\textbf{Local Development Server:} \texttt{npm run dev} starts Vite development server with hot reloading. Code changes reflect immediately in browser without manual refresh.
+
+\textbf{Type Checking:} TypeScript compiler (\texttt{tsc --noEmit}) validates types without producing output, catching errors before runtime.
+
+\textbf{Linting:} ESLint enforces code style and identifies potential bugs. Configuration includes React-specific rules and TypeScript integration.
+
+\textbf{Build Process:} \texttt{npm run build} generates optimized production bundle with minification, tree-shaking, and code splitting.
+
+\textbf{Preview:} \texttt{npm run preview} serves production build locally for final testing before deployment.
+
+\subsection{Deployment Considerations}
+\label{subsec:deployment}
+
+For production deployment, the built application requires:
+
+\textbf{Static Hosting:} The compiled JavaScript, CSS, and HTML can be served from any web server or CDN (Netlify, Vercel, AWS S3 + CloudFront, etc.).
+
+\textbf{Environment Variables:} API endpoints for assessment data retrieval should be configured via environment variables rather than hard-coded.
+
+\textbf{HTTPS:} All traffic must use TLS encryption to protect JWT tokens and patient data in transit.
+
+\textbf{Content Security Policy:} HTTP headers should restrict script sources to prevent cross-site scripting attacks.
+
+\textbf{Cache Headers:} Static assets (JS, CSS, images) should have long cache times for performance; index.html should not be cached to ensure users receive updates.
+
+These considerations should be addressed as part of any production deployment.
+
+\section{Discussion}
+\label{sec:discussion}
+
+This section reflects critically on the design decisions, evaluates how well the implemented solution addresses the research questions, discusses limitations, and considers implications for clinical practice and future research.
+
+\subsection{Achievement of Research Objectives}
+\label{subsec:achievement}
+
+\textbf{RQ1: Interpretable and Actionable Presentation}
+
+The implemented interface addresses interpretability through multiple mechanisms:
+\begin{itemize}
+    \item Transparency: All AI recommendations include confidence levels and access to underlying behavioral data
+    \item Visual encoding: Charts and graphs make patterns immediately apparent without requiring statistical expertise
+    \item Progressive disclosure: Information is layered from overview to detail, matching cognitive load to user needs
+    \item Explanation: Learning mode provides educational context explaining diagnostic significance of features
+\end{itemize}
+
+Clinical workflow alignment is achieved through mode-specific designs matching different assessment contexts. Rather than forcing all users through identical interfaces, the system adapts to varying goals (rapid screening vs. educational exploration vs. detailed investigation).
+
+However, true validation of interpretability and actionability requires user testing with practicing clinicians—an opportunity for future work.
+
+\textbf{RQ2: Multi-Mode Design Consistency}
+
+The three-mode architecture successfully balances customization with consistency:
+\begin{itemize}
+    \item \textbf{Customization:} Each mode presents information at appropriate granularity for its use case
+    \item \textbf{Consistency:} Visual design language, terminology, and navigation patterns remain uniform
+\end{itemize}
+
+Users can transition between modes without relearning interface conventions. The persistent navigation makes mode switching effortless, encouraging exploration.
+
+A potential improvement would be providing explicit guidance on when to use each mode, perhaps through an initial wizard or contextual suggestions based on user actions.
+
+\subsection{Design Trade-offs and Decisions}
+\label{subsec:tradeoffs}
+
+\textbf{Simplicity vs. Completeness}
+
+Screening mode prioritizes simplicity, potentially at the cost of completeness. The concise presentation risks oversimplifying complex diagnostic pictures. This trade-off addresses documented clinician concerns about information overload and screen clutter \parencite{jayawardena2025a}, while the easy transition to assessment mode ensures users can access detail when needed, implementing the layered view approach recommended for clinical AI interfaces \parencite{panigutti2023}.
+
+\textbf{Automation vs. Clinician Authority}
+
+The interface presents AI recommendations prominently but emphasizes uncertainty and provides access to raw data. This design respects clinical expertise while offering technological assistance, addressing the documented challenge of balancing automation with clinical oversight \parencite{bayor2025}. The approach fosters appropriate trust calibration by making system limitations transparent \parencite{nasarian2024a}. Future work might explore interface adaptations based on whether clinicians typically agree or disagree with AI recommendations, potentially adjusting prominence dynamically to match evolving usage patterns over time \parencite{newton2025a}.
+
+\textbf{Efficiency vs. Explanation}
+
+Screening mode minimizes explanation to maximize efficiency, implementing the "succinct" principle recommended for CDSS adoption \parencite{kawamoto2020}. This works for experienced users but might leave less experienced clinicians uncertain. The solution: mode selection based on expertise and goals \parencite{saakyan2023a}. However, automatic recommendations (e.g., "Consider switching to Learning mode for additional context") could improve usability by supporting users in selecting appropriate detail levels.
+
+\textbf{Standardization vs. Customization}
+
+The interface provides fixed modes rather than allowing arbitrary customization. This decision simplifies implementation and ensures consistent experience across users, addressing concerns about design silos and the need for standardized patterns \parencite{bayor2025}. However, this reduces flexibility compared to systems with extensive customization options. Research shows that inability to customize represents a common clinician complaint about CDSS interfaces \parencite{jayawardena2025a}. A middle ground might involve user-configurable preferences within modes (e.g., "Always show comparison statistics" checkbox) while maintaining overall structural consistency.
+
+\subsection{Limitations}
+\label{subsec:limitations}
+
+\textbf{Lack of Empirical Validation}
+
+The most significant limitation is the absence of clinical user testing. While design decisions are grounded in interview findings and HCI principles, actual usability, learnability, efficiency, and impact on diagnostic accuracy remain unknown. Research demonstrates that human-centered design processes employing contextual inquiry, group design sessions, and think-aloud testing are essential for uncovering design issues and validating requirements \parencite{garabedian2022, davidson2025}. Future work must include rigorous user studies with representative clinician participants, recognizing that clinician involvement improves workflow fit even though barriers persist \parencite{newton2023}.
+
+\textbf{Mock Data}
+
+The implementation uses synthetic example data rather than real assessment results from the validated SIT protocol \parencite{drimalla2020b}. While this suffices for interface development, integration with actual ML model outputs producing the documented 74\% accuracy through multimodal fusion \parencite{saakyan2025a} requires additional engineering effort.
+
+\textbf{Limited Temporal Analysis}
+
+Current visualizations show behavioral patterns over time but provide limited tools for identifying specific interaction moments of interest. Enhanced temporal navigation (e.g., "Jump to moments of lowest gaze fixation") could improve assessment mode utility and support the iterative diagnostic discovery process emphasized in CDSS reference models \parencite{zikos2018}.
+
+\textbf{No Collaborative Features}
+
+The interface assumes single-clinician use. Clinical practice often involves team discussion and supervision. Future versions might support annotations, shared views, or commenting for multidisciplinary team contexts, implementing interactive systems with feedback mechanisms that enhance reliability perception \parencite{nasarian2024a}.
+
+\textbf{Static ML Model}
+
+The system treats ML model outputs as fixed inputs. However, models improve over time with additional training data. The interface lacks mechanisms for model version tracking or performance metric display that would inform clinicians about model updates, potentially affecting trust and appropriate reliance on recommendations.
+
+\textbf{Integration Challenges}
+
+While the JWT-based authentication system addresses privacy concerns, the implementation does not fully address the documented challenge that most CDSS remain stand-alone systems lacking integration with clinical information systems \parencite{bayor2025}. True workflow integration would require EHR connectivity, enabling automatic provision of results within clinicians' existing workflows \parencite{kawamoto2020}.
+
+\subsection{Implications for Clinical Practice}
+\label{subsec:clinical-implications}
+
+If validated through clinical testing, this system could:
+
+\textbf{Increase Assessment Capacity:} By reducing time required for behavioral analysis through automated feature extraction \parencite{drimalla2020b, saakyan2025a}, more patients could be evaluated with available specialist resources, potentially addressing the documented bottleneck in autism assessment services.
+
+\textbf{Support Standardization:} The SIT's standardized stimuli and automated analysis reduce inter-rater variability \parencite{drimalla2020b}, potentially improving diagnostic consistency—a documented advantage of computer-based assessment that outperformed majority vote and equaled clinical expert ratings in validation studies.
+
+\textbf{Enhance Training:} Learning mode provides structured educational resource for trainees, accelerating skill development. The documented need for educational interfaces supporting clinicians with varying expertise levels \parencite{saakyan2023a} motivates this training functionality.
+
+\textbf{Enable Triage:} Screening mode could help primary care or general mental health settings identify patients requiring specialist autism assessment, addressing documented access challenges.
+
+However, important considerations include:
+
+\textbf{Technology Access:} Implementation requires reliable internet, modern computers, and video recording equipment—barriers in under-resourced settings.
+
+\textbf{Clinician Training:} While designed for usability following HCD principles \parencite{garabedian2022}, the system still requires orientation and training for effective use. Research shows that only 34.2\% of CDSS achieve sustained adoption \parencite{newton2025a}, emphasizing the need for comprehensive implementation planning \parencite{davidson2025}.
+
+\textbf{Algorithmic Bias:} If training data lacks diversity in age, gender, ethnicity, or cultural background, models may perform poorly for underrepresented groups. The most recent validation study achieved 46\% female representation \parencite{saakyan2025a}, representing progress but highlighting ongoing need for diverse datasets. This risk must be explicitly communicated to users to enable appropriate trust calibration \parencite{nasarian2024a}.
+
+\textbf{Legal and Ethical Frameworks:} AI-assisted diagnosis raises questions about liability, informed consent, and regulatory approval that vary by jurisdiction. The emerging role of Explainable AI in addressing validity and reliability challenges \parencite{bayor2025} may facilitate regulatory acceptance, but comprehensive frameworks remain under development.
+
+\textbf{Integration and Workflow:} Research consistently emphasizes that CDSS must integrate with existing clinical information systems and workflows rather than remaining stand-alone applications \parencite{bayor2025, kawamoto2020}. The current JWT-based delivery system represents an intermediate approach but full EHR integration would be necessary for optimal adoption.
+
+\subsection{Generalizability to Other Domains}
+\label{subsec:generalizability}
+
+While developed for autism assessment, the multi-mode interface architecture has broader applicability:
+
+\textbf{Other Diagnostic Contexts:} Similar approaches could support AI-assisted assessment of ADHD, depression, anxiety, or personality disorders where behavioral analysis is relevant.
+
+\textbf{Medical Imaging:} Radiology workstations could adopt mode-based designs—rapid screening mode for routine cases, detailed analysis mode for complex findings.
+
+\textbf{Clinical Decision Support Generally:} Any CDSS involving complex multimodal data and diverse user expertise could benefit from adaptive interfaces matching information density to user needs and goals.
+
+The core design principle—tailoring interface complexity to task requirements while maintaining consistency—transcends the specific autism assessment context.
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+\subsection{Summary of Contributions}
+\label{subsec:summary}
+
+This thesis addressed the design and implementation of clinician-centered user interfaces for AI-assisted autism assessment based on the Simulated Interaction Task. Through systematic analysis of clinician needs, application of HCI principles, and iterative prototyping, the work produced:
+
+\textbf{Design Requirements Catalog:} A structured compilation of functional and non-functional requirements derived from clinician interviews, organized by use case and grounded in established medical informatics principles.
+
+\textbf{Multi-Mode Interface Architecture:} Three distinct interaction modes—Screening, Learning, and Assessment—each tailored to specific clinical goals and expertise levels while maintaining visual and navigational consistency.
+
+\textbf{Functional Web Application:} A fully implemented prototype using modern technologies (React, TypeScript, Tailwind CSS), demonstrating technical feasibility and providing a foundation for future development and deployment.
+
+\textbf{System Architecture Documentation:} Detailed specification of the end-to-end assessment pipeline, including JWT-based authentication for privacy-preserving result delivery and automatic expiration mechanisms.
+
+\textbf{Design Knowledge:} Transferable insights regarding interface design for AI-supported clinical decision-making, applicable beyond autism assessment to other diagnostic and medical AI contexts.
+
+The work demonstrates that thoughtful interface design can bridge the gap between ML model capabilities and clinical utility, potentially enhancing both the accessibility and effectiveness of technology-assisted assessment.
+
+\subsection{Answers to Research Questions}
+\label{subsec:rq-answers}
+
+\textbf{RQ1: How can clinician-centered user interfaces present AI-supported screening and assessment outputs in ways that are interpretable, actionable, and aligned with clinical workflows?}
+
+This thesis demonstrates that interpretability, actionability, and workflow alignment emerge from:
+\begin{itemize}
+    \item Transparency through explicit uncertainty communication and access to underlying behavioral data
+    \item Visual encoding leveraging preattentive processing (color, size, position) for rapid pattern recognition
+    \item Progressive disclosure managing complexity without hiding important information
+    \item Context-specific design matching interface characteristics to clinical goals
+\end{itemize}
+
+The key insight is that "user-centered design" requires acknowledging diversity among users—experienced diagnosticians have fundamentally different needs than trainees, and different clinical contexts (screening vs. differential diagnosis) demand different interface approaches.
+
+\textbf{RQ2: How can user interfaces be designed to support multiple clinical use cases while maintaining consistency and usability?}
+
+The multi-mode architecture demonstrates that customization and consistency are compatible through:
+\begin{itemize}
+    \item Clear mode selection with explicit descriptions of each mode's purpose
+    \item Consistent visual design language (colors, typography, icons) across modes
+    \item Uniform terminology ensuring behavioral features are labeled identically
+    \item Persistent navigation enabling seamless transitions
+\end{itemize}
+
+Rather than attempting to serve all users with a single interface or creating entirely separate applications, the mode-based approach provides adaptation within a coherent system.
+
+\subsection{Future Research Directions}
+\label{subsec:future-work}
+
+\textbf{Clinical User Studies}
+
+The highest priority for future work is rigorous user testing with clinician participants following established methodologies \parencite{garabedian2022, davidson2025}. Studies should evaluate:
+\begin{itemize}
+    \item Usability metrics (task completion time, error rates, subjective satisfaction)
+    \item Learnability (performance improvement over repeated use)
+    \item Impact on diagnostic accuracy (agreement with gold standard assessments)
+    \item Trust calibration (whether users appropriately weight AI recommendations) \parencite{nasarian2024a}
+    \item Mode selection patterns (which modes are used in which contexts)
+\end{itemize}
+
+Ideally, testing would employ randomized controlled designs comparing AI-assisted assessment with traditional clinical evaluation, building on the validated SIT methodology \parencite{drimalla2020b}.
+
+\textbf{Longitudinal Deployment}
+
+Beyond controlled studies, longitudinal deployment in real clinical settings would reveal:
+\begin{itemize}
+    \item Integration challenges with existing clinical workflows and electronic health record systems \parencite{bayor2025}
+    \item Usage patterns over extended timeframes (initial novelty vs. sustained adoption), recognizing that uptake factors change over time with workarounds emerging after 5 years \parencite{newton2025a}
+    \item Qualitative feedback on strengths and limitations from sustained use
+    \item Impact on patient wait times and assessment capacity
+\end{itemize}
+
+\textbf{Adaptive Interfaces}
+
+Future systems could implement adaptive personalization:
+\begin{itemize}
+    \item Automatically recommending appropriate modes based on user expertise and case complexity
+    \item Learning individual clinician preferences for information density and visualization types
+    \item Highlighting features that historically influenced specific users' diagnostic decisions
+\end{itemize}
+
+However, adaptation must preserve transparency—users should understand why the system is configured as presented.
+
+\textbf{Collaborative Features}
+
+Multi-clinician contexts could be supported through:
+\begin{itemize}
+    \item Shared annotation allowing team members to mark interesting patterns
+    \item Discussion threads attached to specific behavioral features
+    \item Comparison of multiple clinicians' interpretations to support supervision and quality assurance
+\end{itemize}
+
+\textbf{Expanded Modalities}
+
+The current system focuses on video-based behavioral analysis. Future work could integrate:
+\begin{itemize}
+    \item Language analysis (semantic content, pragmatic features, discourse markers)
+    \item Physiological measures (heart rate variability, skin conductance during social interaction)
+    \item Contextual information (developmental history, prior assessments, comorbidity screening results)
+\end{itemize}
+
+This expansion would require careful interface design to avoid overwhelming users with excessive information.
+
+\textbf{Cross-Cultural Validation}
+
+Behavioral norms and diagnostic criteria show cultural variation. Future work should:
+\begin{itemize}
+    \item Evaluate model performance across diverse cultural contexts
+    \item Develop culturally-specific normative comparison data
+    \item Design interfaces supporting cross-cultural considerations
+\end{itemize}
+
+\textbf{Regulatory and Implementation Research}
+
+Translation to clinical practice requires addressing:
+\begin{itemize}
+    \item Regulatory pathways for medical device approval (FDA in US, CE marking in Europe)
+    \item Reimbursement mechanisms (insurance coverage, billing codes)
+    \item Liability frameworks (responsibility for AI errors)
+    \item Informed consent procedures (explaining AI involvement to patients)
+\end{itemize}
+
+These implementation science questions are essential for real-world impact.
+
+\subsection{Closing Remarks}
+\label{subsec:closing}
+
+The application of artificial intelligence to clinical decision-making holds substantial promise for improving healthcare delivery. However, technological capabilities alone do not guarantee clinical utility. As this thesis demonstrates, the interface layer—how AI insights are communicated to human users—critically determines whether sophisticated ML models become useful clinical tools or mere academic curiosities. Research consistently shows that only 34.2\% of CDSS achieve sustained adoption, with success depending on addressing usability, validity, data quality, and integration challenges \parencite{newton2025a, bayor2025}.
+
+Human-centered design, grounded in systematic understanding of user needs and established HCI principles, provides a path from model development to clinician adoption \parencite{garabedian2022}. The multi-mode interface architecture presented here represents one approach to accommodating the diversity of clinical contexts, user expertise levels, and diagnostic goals that characterize real-world practice. By implementing design strategies that address documented challenges—standardized patterns, layered information, actionable explanations, and appropriate trust calibration \parencite{panigutti2023, nasarian2024a}—the system demonstrates how thoughtful interface design can bridge the gap between computational capabilities and clinical utility.
+
+Looking forward, the greatest opportunities lie not in further improving model accuracy—though that remains important—but in deepening our understanding of effective human-AI collaboration in high-stakes medical decision-making. Interface design is not merely aesthetic or ergonomic concern but a substantive problem of epistemic translation: transforming computational pattern recognition into clinically meaningful insight that respects professional expertise while providing genuine assistance. The emerging role of Explainable AI in fostering transparency and trust \parencite{bayor2025}, combined with iterative co-design approaches that reveal clinician priorities \parencite{davidson2025}, points toward increasingly sophisticated integration of AI into clinical workflows.
+
+The work presented in this thesis offers both specific contributions to autism assessment—building on validated multimodal approaches \parencite{drimalla2020b, saakyan2025a}—and general lessons for medical AI interface design applicable to other diagnostic contexts. With appropriate validation and refinement informed by clinical user feedback, systems like SIT-CARE could contribute to more accessible, efficient, and consistent diagnostic practice, ultimately benefiting individuals and families seeking assessment and support.
+    
+
+    
+
+
+
+
+
+\newpage
+\printbibliography[heading=bibintoc]
+\newpage
+\pagenumbering{Roman}
+
+\appendix
+\section{Appendix}
+
+\clearpage
+
+\section*{Declaration of Independence}
+    Ich versichere hiermit, dass ich die vorstehende Seminararbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt habe, dass die vorgelegte Arbeit noch an keiner anderen Hochschule zur Prüfung vorgelegt wurde und dass sie weder ganz noch in Teilen bereits veröffentlicht wurde. Wörtliche Zitate und Stellen, die anderen Werken dem Sinn nach entnommen sind, habe ich in jedem einzelnen Fall kenntlich gemacht.
+    \\
+    \\
+    \\
+    Your Name, den [DATE]
+
+\end{document}
