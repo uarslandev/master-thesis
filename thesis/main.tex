@@ -51,7 +51,7 @@
 
 % --- BIBLIOGRAPHY ---
 \usepackage{csquotes}
-\usepackage[backend=biber, style=authoryear, sorting=nty]{biblatex}
+\usepackage[backend=biber, style=numeric-comp, sorting=none]{biblatex}
 \addbibresource{literature.bib} % Make sure this file exists
 
 \setcounter{tocdepth}{2}
@@ -459,6 +459,13 @@ This technology stack was selected to balance developer productivity, performanc
 
 \subsection{System Architecture Overview}
 \label{subsec:system-arch-overview}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{sequence-diagram.png}
+    \caption{Sequence diagram of the SIT-CARE result delivery and access flow.}
+    \label{fig:system-sequence}
+\end{figure}
 
 The SIT-CARE system comprises several components operating in sequence (illustrated in \autoref{fig:system-sequence}), following a CDSS reference model that emphasizes human-data interactions, cognitive functions, and feedback loops for iterative discovery \parencite{zikos2018}. This thesis focuses on the clinician-facing interface while describing the surrounding components to provide end-to-end context:
 
